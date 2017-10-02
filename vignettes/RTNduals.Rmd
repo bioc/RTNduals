@@ -1,6 +1,6 @@
 ---
 title: "RTNduals: An R/Bioconductor package for analysis of co-regulatory network motifs and inference of 'dual regulons'."
-author: "Vinicius S. Chagas, Clarice S. Groeneveld, Kerstin B. Meyer, A. Gordon Robertson, Mauro A. A. Castro"
+author: "Vinicius S. Chagas, Clarice S. Groeneveld, Kerstin B. Meyer, A. Gordon Robertson, Mauro A. A. Castro."
 date: "`r Sys.Date()`"
 bibliography: bibliography.bib
 output: BiocStyle::html_document
@@ -9,7 +9,6 @@ vignette: >
   %\VignetteIndexEntry{"RTNduals: An R/Bioconductor package for analysis of co-regulatory network motifs and inference of 'dual regulons'."}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\SweaveUTF8
 ---
 
 # Overview
@@ -50,7 +49,7 @@ The **gexp** data matrix and the corresponding annotation are evaluated by the `
 
 ```{r eval=TRUE}
 ##--- generate a pre-processed BR-class object
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1=tfs1, regulatoryElements2=tfs2, gexpIDs=annot, verbose=FALSE)
+rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1=tfs1, regulatoryElements2=tfs2, rowAnnotation=annot, verbose=FALSE)
 rmbr
 ```
 
