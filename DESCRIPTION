@@ -1,9 +1,9 @@
 Package: RTNduals
 Type: Package
 Title: Analysis of co-regulatory network motifs and inference of 'dual regulons'
-Version: 1.1.5
+Version: 1.1.6
 Author: Vinicius S. Chagas, Clarice S. Groeneveld, Gordon Robertson, Kerstin B. Meyer, Mauro A. A. Castro
-Maintainer: Vinicius Chagas <vinicius.chagas@ufpr.br>, Mauro Castro <mauro.castro@ufpr.br>, Clarice Groeneveld <clari.groeneveld@gmail.com>
+Maintainer: Vinicius Chagas <chagas.vis@gmail.com>, Clarice Groeneveld <clari.groeneveld@gmail.com>, Mauro Castro <mauro.castro@ufpr.br>
 Depends: R (>= 3.3.3), methods, RTN(>= 1.15)
 Imports: graphics, grDevices, stats, utils
 Suggests: knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics
@@ -14,4 +14,3 @@ LazyData: TRUE
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-05-04 02:44:03 UTC; castromaa
