@@ -9,6 +9,7 @@ vignette: >
   %\VignetteIndexEntry{"RTNduals: An R/Bioconductor package for analysis of co-regulatory network motifs and inference of 'dual regulons'."}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\SweaveUTF8
 ---
 
 # Overview

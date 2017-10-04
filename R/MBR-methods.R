@@ -172,6 +172,9 @@ setMethod("mbrPermutation",
           "MBR",
           function(object, verbose=TRUE, ...)
           {
+            ##--- input check
+            if(object@status["Preprocess"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires preprocessing!")
             ##---checks
             mbr.checks(name="object", para=object)
             mbr.checks(name="verbose", para=verbose)
@@ -253,6 +256,11 @@ setMethod("mbrBootstrap",
           "MBR",
           function(object, verbose=TRUE, ...)
           {
+            ##--- input check
+            if(object@status["Preprocess"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires preprocessing!")
+            if(object@status["Permutation"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires permutation analysis!") 
             ##---checks
             mbr.checks(name="object", para=object)
             mbr.checks(name="verbose", para=verbose)
@@ -341,6 +349,11 @@ setMethod("mbrDpiFilter",
           "MBR",
           function(object, verbose=TRUE, ...)
           {
+            ##--- input check
+            if(object@status["Preprocess"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires preprocessing!")
+            if(object@status["Permutation"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires permutation/bootstrap analysis!")
             ##---checks
             mbr.checks(name="object", para=object)
             mbr.checks(name="verbose", para=verbose)
@@ -448,6 +461,13 @@ setMethod("mbrAssociation",
                    minRegulonSize=15, prob=0.95, estimator='spearman', 
                    pAdjustMethod="BH", verbose=TRUE)
           {
+            ##--- input check
+            if(object@status["Preprocess"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires preprocessing!")
+            if(object@status["Permutation"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires permutation/bootstrap and DPI filter!")  
+            if(object@status["DPI.filter"]!="[x]")
+              stop("NOTE: MBR object is not compleate: requires DPI filter!")
             ##--- gets
             TNI1 <- mbrGet(object, what="TNI1")
             TNI2 <- mbrGet(object, what="TNI2")
@@ -692,6 +712,8 @@ setMethod( "mbrDuals",
            function(object, supplementaryTable=NULL, evidenceColname, 
                     verbose=TRUE)
            {
+             if(object@status["Association"]!="[x]")
+               stop("NOTE: MBR object is not compleate: requires 'mbrAssociation' analysis!")
              ##--- initial checks
              mbr.checks(name="object", para=object)
              dualsInformation <- mbrGet(object, what="dualsInformation")
