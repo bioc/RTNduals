@@ -1,5 +1,5 @@
 ---
-title: "RTNduals: An R/Bioconductor package for analysis of co-regulatory network motifs and inference of 'dual regulons'."
+title: "RTNduals: analysis of co-regulatory network motifs and inference of 'dual regulons'."
 author: "Vinicius S. Chagas, Clarice S. Groeneveld, Kerstin B. Meyer, A. Gordon Robertson, Mauro A. A. Castro."
 date: "`r doc_date()`"
 package: "`r pkg_ver('RTN')`"
@@ -8,7 +8,7 @@ abstract: Multiple regulators can co-operate or compete to control biological pr
 output: 
   BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{"RTNduals: An R/Bioconductor package for analysis of co-regulatory network motifs and inference of 'dual regulons'."}
+  %\VignetteIndexEntry{"RTNduals: analysis of co-regulatory network motifs and inference of 'dual regulons'."}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\SweaveUTF8
