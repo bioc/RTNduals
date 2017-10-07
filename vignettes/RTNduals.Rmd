@@ -2,16 +2,16 @@
 title: "RTNduals: analysis of co-regulatory network motifs and inference of 'dual regulons'."
 author: "Vinicius S. Chagas, Clarice S. Groeneveld, Kerstin B. Meyer, A. Gordon Robertson, Mauro A. A. Castro."
 date: "`r doc_date()`"
-package: "`r pkg_ver('RTN')`"
+package: "`r pkg_ver('RTNduals')`"
 bibliography: bibliography.bib
-abstract: Multiple regulators can co-operate or compete to control biological processes. RTNduals is a tool derived from the [RTN](http://bioconductor.org/packages/RTN/) (Reconstruction of Transcriptional Networks) package and searches for possible co-regulatory relationships between pairs of regulators. The tool infers "dual regulon" status, a new concept that tests whether pairs of regulators have similar effects on their sets of target genes (regulons). Members of a pair can be of similar types or different types (e.g. transcription factor (TF)-TF, miRNA-miRNA, TF-miRNA, TF-mRNA). RTN infers interactions between a list of regulators and candidate target gene sets (i.e. regulons) using Mutual Information (MI). The "dual regulon" extension identifies shared targets and assesses the similarity in regulation for these shared targets. RTNduals can identify regulators with shared or opposing effects on cellular phenotypes and can be applied to many different regulatory processes.
+abstract: <p>Multiple regulators can co-operate or compete to control biological processes. RTNduals is a tool derived from the [RTN](http://bioconductor.org/packages/RTN/) (Reconstruction of Transcriptional Networks) package and searches for possible co-regulatory relationships between pairs of regulators. The tool infers "dual regulon" status, a new concept that tests whether pairs of regulators have similar effects on their sets of target genes (regulons). Members of a pair can be of similar types or different types (e.g. transcription factor (TF)-TF, miRNA-miRNA, TF-miRNA, TF-mRNA). RTN infers interactions between a list of regulators and candidate target gene sets (i.e. regulons) using Mutual Information (MI). The "dual regulon" extension identifies shared targets and assesses the similarity in regulation for these shared targets. RTNduals can identify regulators with shared or opposing effects on cellular phenotypes and can be applied to many different regulatory processes.</p>
 output: 
-  BiocStyle::html_document
+  BiocStyle::html_document:
+    css: custom.css
 vignette: >
   %\VignetteIndexEntry{"RTNduals: analysis of co-regulatory network motifs and inference of 'dual regulons'."}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\SweaveUTF8
 ---
 
 # Overview
