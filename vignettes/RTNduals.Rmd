@@ -140,8 +140,8 @@ mbrPlotDuals(rmbr, names.duals = duals[1])
 ![title](fig2.png)
 <b>Figure 2.</b>  The <b>'mbrPlotDuals'</b> function shows the shared cloud of targets. In (<b>a</b>) the regulators agree on the downstream effects, while in (<b>b</b>) they disagree. The colour pattern follows the schematics in <b>Figure 1</b>.
 
-# Session Info
-```{r}
+# Session information
+```{r label='Session information', eval=TRUE, echo=FALSE}
 sessionInfo()
 ```
 
