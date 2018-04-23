@@ -12,12 +12,12 @@
 \arguments{
 \item{TNI1}{A 'TNI' class object.}
 
-\item{TNI2}{Another 'TNI' class object}
+\item{TNI2}{Optional 'TNI' class object}
 
 \item{regulatoryElements1}{A character vector specifying which 
 'TNI1' regulatory elements should be evaluated.}
 
-\item{regulatoryElements2}{A character vector specifying which 
+\item{regulatoryElements2}{Optional character vector specifying which 
 'TNI2' regulatory elements should be evaluated.}
 
 \item{verbose}{A single logical value specifying to display detailed messages 
@@ -27,7 +27,7 @@
 An \linkS4class{MBR} object.
 }
 \description{
-This function merges two TNI class objects and creates one MBR class object.
+This function converts one or two TNI class objects and into one MBR class object.
 }
 \examples{
 #--- load a dataset for demonstration
@@ -40,15 +40,13 @@ tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
 \dontrun{
 
 ##--- compute a TNI for tfs1
-tni1 <- new("TNI", gexp=gexp, regulatoryElements=tfs1)
-tni1 <- tni.preprocess(tni1, rowAnnotation=annot)
+tni1 <- tni.constructor(expData=gexp, regulatoryElements=tfs1, rowAnnotation=annot)
 tni1 <-tni.permutation(tni1)
 tni1 <-tni.bootstrap(tni1)
 tni1 <-tni.dpi.filter(tni1)
 
 ##--- compute a TNI for tfs2
-tni2 <- new("TNI", gexp=gexp, regulatoryElements=tfs2)
-tni2 <- tni.preprocess(tni2, rowAnnotation=annot)
+tni2 <- tni.constructor(expData=gexp, regulatoryElements=tfs2, rowAnnotation=annot)
 tni2 <-tni.permutation(tni2)
 tni2 <-tni.bootstrap(tni2)
 tni2 <-tni.dpi.filter(tni2)

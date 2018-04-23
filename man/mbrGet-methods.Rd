@@ -12,9 +12,9 @@
 \item{object}{A preprocessed object of class \linkS4class{MBR}}
 
 \item{what}{a single character value specifying which information should be 
-retrieved from the slots. Options: "TNI1", "TNI2", "testedElementsTNI1", 
-"testedElementsTNI2", "dualRegulons", "results", "para", "summary", 
-"status" and "dualsInformation"}
+retrieved from the slots. Options: "TNI1", "TNI2", "regulatoryElements1", 
+"regulatoryElements2", "dualRegulons", "results", "para", "summary", 
+"status", "dualsCorrelation", "dualsOverlap", and "dualsCorMatrix"}
 }
 \value{
 A slot content from a object of class 'MBR' \linkS4class{MBR} object

@@ -4,26 +4,24 @@
 \alias{mbrPlotDuals}
 \title{Plot shared target clouds between dual regulons.}
 \usage{
-mbrPlotDuals(object, names.duals = NULL, filepath = NULL, alpha = 0.8,
-  lncols = c("darkgreen", "darkorange3"))
+mbrPlotDuals(object, duals.names, filepath = NULL, ptcols = c("#006400FF",
+  "#CD6600FF"))
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by 
 the method \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}.}
 
-\item{names.duals}{A vector with 'dual regulon' indentifiers from the 
-'dualsInformation' table.}
+\item{duals.names}{A character string indicating the file path where the plot 
+should be saved.}
 
 \item{filepath}{A character string indicating the file path where the plot 
 should be saved.}
 
-\item{alpha}{The alpha transparency, a number in [0,1].}
-
-\item{lncols}{A vector of length 2 indicating the colors of the negative 
-and positive target clouds, respectively.}
+\item{ptcols}{A vector of length 2 indicating colors of negative 
+and positive correlations, respectively.}
 }
 \value{
-A plot with the shared target clouds between dual regulons.
+A plot showing targets of dual regulons.
 }
 \description{
 This function plots the shared target clouds between a regulon pair.
@@ -40,23 +38,23 @@ tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
 rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
 regulatoryElements2=tfs2, rowAnnotation=annot)
 
+\dontrun{
+
 ##--- run mbrPermutation
-rmbr <- mbrPermutation(rmbr, nPermutations=10)
+rmbr <- mbrPermutation(rmbr, nPermutations=1000)
 
 ##--- run mbrBootstrap
-rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
+rmbr <- mbrBootstrap(rmbr, nBootstrap=100)
 
 ##-- run mbrDpiFilter
 rmbr <- mbrDpiFilter(rmbr)
 
 ##--- run mbrAssociation
-rmbr <- mbrAssociation(rmbr, prob=0.75)
-
-##--- run mbrDuals
-rmbr <- mbrDuals(rmbr)
+rmbr <- mbrAssociation(rmbr, nPermutations=1000)
 
 ##--- get inferred duals and plot the shared cloud of targets
 duals <- mbrGet(rmbr, what="dualRegulons")
-mbrPlotDuals(rmbr, names.duals=duals[1])
+mbrPlotDuals(rmbr, duals.names=duals[1])
 
+}
 }

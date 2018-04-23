@@ -15,8 +15,8 @@ setClassUnion("TNInull", members = c("TNI", "NULL"))
 #' 
 #' @slot TNI1 a 'TNI' object created by the RTN package.
 #' @slot TNI2 another 'TNI' object created by the RTN package.
-#' @slot testedElementsTNI1 regulatory elements listed in the TNI1.
-#' @slot testedElementsTNI2 regulatory elements listed in the TNI2.
+#' @slot regulatoryElements1 regulatory elements listed in the TNI1.
+#' @slot regulatoryElements2 regulatory elements listed in the TNI2.
 #' @slot dualRegulons all possible 'duals regulons' computed by 
 #' \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}
 #' @slot results a list, results from the MBR methods.
@@ -44,8 +44,8 @@ setClass(
   slots=c(
     TNI1="TNInull",
     TNI2="TNInull",
-    testedElementsTNI1="character",
-    testedElementsTNI2="character",
+    regulatoryElements1="character",
+    regulatoryElements2="character",
     dualRegulons="character",
     results="list",
     para='list',
@@ -54,8 +54,8 @@ setClass(
   ), prototype=list(
     TNI1=NULL,
     TNI2=NULL,
-    testedElementsTNI1=character(),
-    testedElementsTNI2=character(),
+    regulatoryElements1=character(),
+    regulatoryElements2=character(),
     dualRegulons=character(),
     results=list(),
     para=list(),

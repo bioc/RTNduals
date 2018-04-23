@@ -58,83 +58,80 @@ rmbr
 ## Run permutation analysis
 The `mbrPermutation` method inherits the same algorithm implemented in the **RTN** package. This function takes the pre-processed **MBR-class** object and returns two regulatory networks that are inferred by mutual information analysis (with multiple hypothesis testing corrections). The results are included in the 'TNI' slots, which will be used in the subsequent steps of the pipeline.
 
-```{r eval=TRUE}
+```{r include=FALSE}
 ##--- compute two regulatory networks
 ##--- (set nPermutations>=1000)
 rmbr <- mbrPermutation(rmbr, nPermutations=100, verbose=FALSE)
-rmbr
+```
+
+```{r eval=FALSE}
+##--- compute two regulatory networks
+##--- (set nPermutations>=1000)
+rmbr <- mbrPermutation(rmbr, nPermutations=100)
 ```
 
 ## Run bootstrap analysis
 In additional to the permutation analysis, the stability of the regulatory networks is assessed by bootstrapping using the `mbrBootstrap` function, which also inherits the same algorithm from the **RTN** package. Each 'TNI' slot of the **MBR-class** object is updated with a consensus bootstrap network.
 
-```{r eval=TRUE}
+
+```{r include=FALSE}
 ##--- check the stability of the two regulatory networks
 ##--- (set nBootstrap>=100)
 rmbr <- mbrBootstrap(rmbr, nBootstrap=10, verbose=FALSE)
-rmbr
+```
+
+```{r eval=FALSE}
+##--- check the stability of the two regulatory networks
+##--- (set nBootstrap>=100)
+rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
 ```
 
 ## Run DPI filter
 In a given regulatory network each target can be linked to multiple regulators as a result of both direct and indirect interactions. The Data Processing Inequality (DPI) algorithm [@Meyer2008] is used to remove the weakest interaction between two regulators and a common target. This step inherits the algorithm that is implemented in the **RTN** package, and it is optional for the analyses described in this workflow (the results of this step can be used to assess regulon activity in the **RTN** package).
 
-```{r eval=TRUE}
+```{r include=FALSE}
 ##---apply DPI algorithm
-rmbr <- mbrDpiFilter(rmbr, eps=0.05, verbose=FALSE)
-rmbr
+rmbr <- mbrDpiFilter(rmbr, verbose=FALSE)
+```
+
+```{r eval=FALSE}
+##---apply DPI algorithm
+rmbr <- mbrDpiFilter(rmbr)
 ```
 
 ## Run association analysis between regulons
 The `mbrAssociation` method takes the two transcriptional networks computed in the previous steps and enumerates all motifs between all regulons. The method retrieves the mutual information between regulators and assesses the agreement between the predicted downstream effects using correlation analysis. A hypergeometric test is used to evaluate whether the common targets are potentially affected by both regulators in a number greater than expected by chance. Note that this example warns the user that only a few regulon pairs are being tested. This warning is to recall that the search space should ideally represent all possible combinations of a given class of regulators (for example, all nuclear receptors annotated for a given species).
 
-```{r eval=TRUE}
+```{r include=FALSE}
 ##--- run the main RTNduals methods
-rmbr <- mbrAssociation(rmbr, prob=0.75, verbose=FALSE)
+rmbr <- mbrAssociation(rmbr, verbose=FALSE)
 ```
 
-A summary of the results can be accessed from the 'summary' slot using the `mbrGet` function.
+```{r eval=FALSE}
+##--- run the main RTNduals methods
+rmbr <- mbrAssociation(rmbr)
+```
+
+A summary of the results can be accessed from 'rmbr' using the `mbrGet` function.
 
 ```{r eval=TRUE}
 ##--- check summary
 mbrGet(rmbr, what="summary")
 ```
 
-## Rank 'dual regulons'
-The `mbrDuals` method ranks all candidates using the correlation values computed in the `mbrAssociation` step, and returns the list of 'dual regulons'.
-
 ```{r eval=TRUE}
-##--- run 'mbrDuals' and get results
-rmbr <- mbrDuals(rmbr)
-results <- mbrGet(rmbr, what="dualsInformation")
+##--- run 'mbrGet' and get results
+mbrGet(rmbr, what="dualsCorrelation")
 ```
 
 Also, when prior evidences are available this method can add a 'supplementaryTable' regarding the association between regulators. The 'supplementaryTable' is a 'data.frame' listing unique relationships between any two regulators used to compute the 'dual regulons' (please refer to the documentation for details on the input data format).
-
-```{r eval=TRUE}
-##--- here we build a 'toy' evidence table using the 'rnorm' function
-supplementaryTable <- results[ ,c("Regulon1","Regulon2")]
-supplementaryTable$ToyEvidence <- rnorm(nrow(results))
-supplementaryTable
-```
-
-```{r eval=TRUE}
-##--- add supplementary evidences with the 'mbrDuals' function
-rmbr <- mbrDuals(rmbr, supplementaryTable = supplementaryTable, 
-                  evidenceColname = "ToyEvidence", verbose = FALSE)
-```
-
-```{r eval=TRUE}
-##--- check updated results
-mbrGet(rmbr, what="dualsInformation")
-```
-
 
 ## Visualize shared cloud of targets
 The package provides the `mbrPlotDuals` function to visualize 'dual regulon' and the respective motifs, which represent the shared cloud of targets. **Figure 2** shows two examples of 'dual regulons' for the schematics illustrated in **Figure 1**. In **(a)** the two regulators agree on the downstream effect (i.e. same directions), while in **(b)** they disagree (i.e. opposite directions).
 
 ```{r eval=FALSE}
 duals <- mbrGet(rmbr, what="dualRegulons")
-mbrPlotDuals(rmbr, names.duals = duals[1])
+mbrPlotDuals(rmbr, duals.names = duals[1])
 ```
 
 ![title](fig2.png)

@@ -7,8 +7,9 @@
 \title{Motifs analysis and inference of 'dual regulons'.}
 \usage{
 \S4method{mbrAssociation}{MBR}(object, regulatoryElements1 = NULL,
-  regulatoryElements2 = NULL, minRegulonSize = 15, prob = 0.95,
-  estimator = "spearman", pAdjustMethod = "BH", verbose = TRUE)
+  regulatoryElements2 = NULL, minRegulonSize = 15, pValueCutoff = 0.001,
+  pAdjustMethod = "BH", estimator = "spearman", nPermutations = 1000,
+  miFilter = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by the 
@@ -28,14 +29,20 @@ elements will be evaluated.}
 minimum number of elements in a regulon. Gene sets with fewer than this 
 number are removed from the analysis.}
 
-\item{prob}{A numeric value, representing a quantile threshold applyed to 
-the association metric used to infer 'dual regulons'.}
+\item{pValueCutoff}{a single numeric value specifying the cutoff for p-values 
+considered significant.}
+
+\item{pAdjustMethod}{A single character value specifying the p-value 
+adjustment method to be used (see 'p.adjust' function for details).}
 
 \item{estimator}{A character value specifying the estimator used in the 
 association analysis. One of "spearman" (default), "kendall", or "pearson".}
 
-\item{pAdjustMethod}{A single character value specifying the p-value 
-adjustment method to be used (see 'p.adjust' function for details).}
+\item{nPermutations}{A single integer value specifying the number of 
+permutations for deriving p-values associating regulon pairs.}
+
+\item{miFilter}{A single logical value specifying to apply the 'miFilter' 
+between two regulators.}
 
 \item{verbose}{A single logical value specifying to display detailed 
 messages (when verbose=TRUE) or not (when verbose=FALSE).}
@@ -61,16 +68,16 @@ tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
 rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
 regulatoryElements2=tfs2, rowAnnotation=annot)
 
-##--- run mbrPermutation
-rmbr <- mbrPermutation(rmbr, nPermutations=10)
+##--- run mbrPermutation (set nPermutations>=1000)
+rmbr <- mbrPermutation(rmbr, nPermutations=30)
 
-##--- run mbrBootstrap
-rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
+##--- run mbrBootstrap (nBootstrap>=100)
+rmbr <- mbrBootstrap(rmbr, nBootstrap=30)
 
 ##--- run mbrDpiFilter
 rmbr <- mbrDpiFilter(rmbr)
 
-##--- run mbrAssociation
-rmbr <- mbrAssociation(rmbr, minRegulonSize = 15, prob=0.75)
+##--- run mbrAssociation (set nPermutations>=1000)
+rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=30)
 
 }

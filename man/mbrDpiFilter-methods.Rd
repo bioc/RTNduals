@@ -40,10 +40,10 @@ tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
 rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
 regulatoryElements2=tfs2, rowAnnotation=annot)
 
-##--- run mbrPermutation
+##--- run mbrPermutation (set nPermutations>=1000)
 rmbr <- mbrPermutation(rmbr, nPermutations=10)
 
-##--- run mbrBootstrap
+##--- run mbrBootstrap (set nBootstrap>=100)
 rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
 
 ##--- run mbrDpiFilter

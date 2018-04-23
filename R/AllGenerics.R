@@ -15,18 +15,18 @@ setGeneric("mbrDpiFilter",
              standardGeneric("mbrDpiFilter"), package="RTNduals")
 setGeneric("mbrAssociation",
            function(object, regulatoryElements1=NULL, 
-                    regulatoryElements2=NULL, minRegulonSize=50, 
-                    prob=0.95, estimator='spearman', 
-                    pAdjustMethod="BH", verbose=TRUE)
+                    regulatoryElements2=NULL, minRegulonSize=15, 
+                    pValueCutoff=0.001, pAdjustMethod="BH", 
+                    estimator='spearman', nPermutations=1000, 
+                    miFilter=TRUE, verbose=TRUE)
              standardGeneric("mbrAssociation"), package="RTNduals")
-setGeneric("mbrDuals",
-           function(object, supplementaryTable = NULL,
+setGeneric("mbrPriorEvidenceTable",
+           function(object, priorEvidenceTable = NULL,
                     evidenceColname=NULL, verbose = TRUE)
-             standardGeneric("mbrDuals"), package="RTNduals")
+             standardGeneric("mbrPriorEvidenceTable"), package="RTNduals")
 setGeneric("tni2mbrPreprocess",
-           function(TNI1, TNI2,
-                    regulatoryElements1=NULL, regulatoryElements2=NULL,
-                    verbose = TRUE)
+           function(TNI1, TNI2, regulatoryElements1=NULL, 
+                    regulatoryElements2=NULL, verbose = TRUE)
              standardGeneric("tni2mbrPreprocess"), package="RTNduals")
 setGeneric("mbrGet",
            function(object, what="status")

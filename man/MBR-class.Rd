@@ -22,9 +22,9 @@ All the information is stored in nine slots.
 
 \item{\code{TNI2}}{another 'TNI' object created by the RTN package.}
 
-\item{\code{testedElementsTNI1}}{regulatory elements listed in the TNI1.}
+\item{\code{regulatoryElements1}}{regulatory elements listed in the TNI1.}
 
-\item{\code{testedElementsTNI2}}{regulatory elements listed in the TNI2.}
+\item{\code{regulatoryElements2}}{regulatory elements listed in the TNI2.}
 
 \item{\code{dualRegulons}}{all possible 'duals regulons' computed by 
 \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}}
