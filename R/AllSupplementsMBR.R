@@ -4,41 +4,46 @@
 
 ##------------------------------------------------------------------------------
 ##check annotation of the input regulatory elements in the 'TNI'
-.checkRegel <- function(tni, regulatoryElements){
-  #---check regulatoryElements
+.checkRegel <- function(tni, regel){
+  #---check regel
   tp <- sapply(colnames(tni@rowAnnotation), function(i) {
-    sum(regulatoryElements%in%tni@rowAnnotation[, i])
+    sum(regel%in%tni@rowAnnotation[, i])
   })
   colid <- names(tp[which.max(tp)])
-  idx <- which(tni@rowAnnotation[, colid]%in%regulatoryElements)
-  if(length(idx) < length(regulatoryElements)) {
-    warning("Not all 'regulatory elements' are available in the 'TNI' rowAnnotation!",
+  idx <- which(tni@rowAnnotation[, colid]%in%regel)
+  if(length(idx) < length(regel)) {
+    warning("Not all names in 'regulatoryElements' are available in the 'TNI' rowAnnotation!",
             call.=FALSE)
   }
-  regulatoryElements <- tni@rowAnnotation[idx,]
-  idx <- match(rownames(regulatoryElements), tni@regulatoryElements)
-  if(length(idx)==0){
-    tp <- paste("NOTE: no 'regulatory element' has been used to call",
-                "regulons in the provided 'TNI'!")
+  tp <- tni@rowAnnotation[idx,]
+  idx <- tni@regulatoryElements %in% rownames(tp)
+  if(sum(idx)==0){
+    tp <- paste("NOTE: no names in 'regulatoryElements' has been used to call ",
+                "regulons in the provided 'TNI'!", sep="")
     stop(tp, call.=FALSE)
-  } else if(length(idx) < length(regulatoryElements)){
-    tp <- paste("Not all input 'regulatory elements' have been used to call",
-                "regulons in the provided 'TNI'!")
+  } else if(sum(idx) < length(regel)){
+    tp <- paste("Not all names in 'regulatoryElements' have been used to call ",
+                "regulons in the provided 'TNI'!", sep="")
     warning(tp, call.=FALSE)
   }
-  regulatoryElements <- tni@regulatoryElements[idx]
-  return (regulatoryElements)
+  regel <- tni@regulatoryElements[idx]
+  if(length(regel)<2){
+    tp <- paste("NOTE: at least two valid names in 'regulatoryElements'", 
+                " are required to call dual regulons!", sep="")
+    stop(tp, call.=FALSE)
   }
+  return (regel)
+}
 
 ##------------------------------------------------------------------------------
 #return 'regcor' in a table format
-.getStatlist <- function(regcor,regulatoryElements1, regulatoryElements2){
+.getStatlist <- function(regcor,regulatoryElements){
   coord <- which(!is.na(regcor), arr.ind = TRUE)
   rnames <- rownames(regcor)[coord[, 1]]
   cnames <- colnames(regcor)[coord[, 2]]
   rvals <- regcor[coord]
-  statlist <- data.frame(Regulon1=rnames,Regulon2=cnames, 
-                         ID_regulon1=regulatoryElements1[rnames], ID_regulon2=regulatoryElements2[cnames],
+  statlist <- data.frame(Regulon1=cnames,Regulon2=rnames, 
+                         ID_regulon1=regulatoryElements[cnames], ID_regulon2=regulatoryElements[rnames],
                          R.Regulons=rvals, stringsAsFactors=FALSE)
   rownames(statlist) <- paste(statlist$Regulon1, statlist$Regulon2, sep="~")
   return(statlist)
@@ -82,12 +87,11 @@
 
 ##------------------------------------------------------------------------------
 ##compure correlation p-value from permutation analysis
-.permCorPval <- function(cortnet1, cortnet2, statlist, interegulons,
+.permCorPval <- function(cortnet, statlist, interegulons,
                          estimator, nper=1000, verbose=TRUE){
   r1names <- statlist$ID_regulon1
   r2names <- statlist$ID_regulon2
-  cortnet1 <- abs(cortnet1)
-  cortnet2 <- abs(cortnet2)
+  cortnet <- abs(cortnet)
   #--- get min regulon size
   ssize <- sapply(1:nrow(statlist), function(i){
     r1 <- r1names[i]
@@ -99,8 +103,8 @@
   if(verbose) pb <- txtProgressBar(style=3)
   nulls <- sapply(1:ntests, function(i){
     if(verbose) setTxtProgressBar(pb, i/ntests)
-    r1 <- cortnet1[,r1names[i]]
-    r2 <- cortnet2[,r2names[i]]
+    r1 <- cortnet[,r1names[i]]
+    r2 <- cortnet[,r2names[i]]
     n <- ssize[i]
     cor(replicate(nper,sample(r1,n)),sample(r2,n), method=estimator)
   })
@@ -231,45 +235,6 @@
 }
 
 ##------------------------------------------------------------------------------
-##checks to merge two 'TNIs' objects
-.checkTNIsProcessing <- function (tni1, tni2, verbose = TRUE){
-  ## checks gexp consistency
-  if (verbose)
-    cat("-Checking expression matrix consistency...\n")
-  if (!identical(tni1@gexp,tni2@gexp))
-    stop("NOTE: TNIs should use the same expression matrix.")
-  
-  ## checks parameter consistency
-  if (verbose)
-    cat("-Checking parameter consistency...\n")
-  tp1 <- unlist(tni1@para)
-  tp2 <- unlist(tni2@para)
-  idx <- tp1%in%tp2
-  if(!all(idx)){
-    tp <- paste("TNIs were not computed using the same parameters!",
-                "The following patameters seem to differ between the two:\n",
-                paste(names(tp1)[idx], collapse = "\n "))
-    warning(tp)
-  }
-  ## checks whether both TNIs have undergone all methods in RTN from
-  ## Permutation to DPI filter
-  if (verbose)
-    cat("-Checking if all TNI methods are completed...\n")
-  if(any(tni1@status[1:4] != "[x]") || any(tni2@status[1:4] != "[x]")){
-    ## gives feedback on which methods were not run
-    if (verbose){
-      cat("TNI1: ")
-      print(tni1@status)
-      cat("TNI2: ")
-      print(tni2@status)
-    }
-    tp <- paste("NOTE: both TNIs must be evaluated by the RTN pipeline,",
-                "up to the DPI filter step!")
-    stop(tp, call. = FALSE)
-  }
-}
-
-##------------------------------------------------------------------------------
 ##check the consistency of priorEvidenceTable
 .checkConsistencySuppTable <- function(object, priorEvidenceTable, verbose)
   {
@@ -338,16 +303,12 @@
     object@summary <- para
   } else if(name=="status") {
     object@status <- para
-  } else if(name=="TNI1"){
-    object@TNI1 <- para
-  } else if(name=="TNI2"){
-    object@TNI2 <- para
+  } else if(name=="TNI"){
+    object@TNI <- para
   } else if(name=="statusUpdate"){
     object@status[para] <- "[x]"
-  } else if(name=="regulatoryElements1"){
-    object@regulatoryElements1 <- para
-  } else if(name=="regulatoryElements2"){
-    object@regulatoryElements2 <- para
+  } else if(name=="regulatoryElements"){
+    object@regulatoryElements <- para
   } else if(name=="dualRegulons"){
     object@dualRegulons <- para
   } else if(name=="dualsCorrelation"){
@@ -358,21 +319,22 @@
   return(object)
 }
 
-# ##------------------------------------------------------------------------------
-# #compute cor p-values
-# .corPval <- function(statlist, regulatoryElements1, regulatoryElements2,
-#                      regulons1, regulons2, pAdjustMethod){
-#   pvals <- sapply(1:nrow(statlist), function(i) {
-#     reg1 <- regulatoryElements1[statlist$Regulon1[i]]
-#     reg2 <- regulatoryElements2[statlist$Regulon2[i]]
-#     N <- min(length(regulons1[[reg1]]), length(regulons2[[reg2]]))
-#     R <- statlist$R.Regulons[i]
-#     2 * pt( -abs( R*sqrt((N-2)/(1-R^2)) ), N-2)
-#   })
-#   adjpvals <- p.adjust(pvals, method = pAdjustMethod)
-#   statlist$Pvalue2 <- pvals
-#   statlist$Adjusted.Pvalue2 <- adjpvals
-#   return(statlist)
-#   
+
+# .merge.tnis <- function (TNI1, TNI2){
+#   elreg1 <- tni.get(TNI1, "regulatoryElements")
+#   elreg2 <- tni.get(TNI2, "regulatoryElements")
+#   elregs <- c(elreg1, elreg2)
+#   elregs <- elregs[!duplicated(elregs)]
+#   rtni_merge <- new("TNI",gexp = tni.get(TNI1, "gexp"), regulatoryElements = elregs)
+#   rtni_merge@rowAnnotation <- object@TNI1@rowAnnotation
+#   rtni_merge@para <- tni.get(TNI1, "para")
+#   tnet1 <- tni.get(TNI1, "refnet")[, elreg1]
+#   tnet2 <- tni.get(TNI2, "refnet")[, setdiff(elreg2,elreg1)]
+#   rtni_merge@results$tn.ref <- cbind(tnet1, tnet2)
+#   tnet1 <- tni.get(TNI1, "tnet")[, elreg1]
+#   tnet2 <- tni.get(TNI2, "tnet")[, setdiff(elreg2,elreg1)]
+#   rtni_merge@results$tn.dpi <- cbind(tnet1, tnet2)
+#   rtni_merge@status [1:4] <- "[x]"
+#   return (rtni_merge)
 # }
 

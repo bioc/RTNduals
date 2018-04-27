@@ -6,17 +6,14 @@
 \alias{mbrPreprocess}
 \title{A preprocessing function for objects of class MBR.}
 \usage{
-\S4method{mbrPreprocess}{matrix}(gexp, regulatoryElements1, regulatoryElements2,
-  verbose = TRUE, ...)
+\S4method{mbrPreprocess}{matrix}(gexp, regulatoryElements, verbose = TRUE,
+  ...)
 }
 \arguments{
 \item{gexp}{A numerical matrix, typically with mRNA and/or miRNA expression 
 values.}
 
-\item{regulatoryElements1}{A named vector with regulatory elements listed in 
-'gexp' rownames.}
-
-\item{regulatoryElements2}{A named vector with regulatory elements listed in 
+\item{regulatoryElements}{A named vector with regulatory elements listed in 
 'gexp' rownames.}
 
 \item{verbose}{A single logical value specifying to display detailed 
@@ -36,11 +33,10 @@ A preprocessing function for objects of class MBR.
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
-tfs1 <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
+tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
 ##--- run mbrPreprocess
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
-regulatoryElements2=tfs2, rowAnnotation=annot)
+rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs,
+rowAnnotation=annot)
 
 }

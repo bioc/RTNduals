@@ -18,7 +18,7 @@ mbr.checks <- function(name, para, paraSuppl){
     }
   }
   ##---
-  else if(name == "regulatoryElements1" || name == "regulatoryElements2"){
+  else if(name == "regulatoryElements"){
     if( !is.character(para) || any(is.na(para)) || 
         any(para == "") || is.null(para)  ){
       tp <- paste("NOTE: 'regulatoryElements' should be a character vector,",
@@ -93,8 +93,8 @@ mbr.checks <- function(name, para, paraSuppl){
   ##---
   else if(name=="numberRegElements"){
     if(length(para)==0)
-      stop("NOTE: at least 1 regulatory element should be listed in both 
-           'regulatoryElement1' and 'regulatoryElement2'!", call.=FALSE)
+      stop("NOTE: at least 1 regulatory element should be listed in both 'regulatoryElements'!", 
+           call.=FALSE)
   }
   ##---
   else if(name=="pValueCutoff") {
@@ -154,15 +154,14 @@ mbr.checks <- function(name, para, paraSuppl){
   ##---
   else if(name == "tni"){
     if((class(para) != 'TNI') || is.null(para)){
-      stop("NOTE: 'tni1' and 'tni2' should be TNI-class objects!", call.=FALSE)
+      stop("NOTE: 'TNI' objects should be of TNI-class!", call.=FALSE)
     }
   }
   ##---
   else if(name=="mbrGet"){
     opts <- c("summary", "status", "results", 
               "dualRegulons", "dualsCorrelation", "dualsOverlap",
-              "TNI1", "TNI2", "regulatoryElements1", 
-              "regulatoryElements2","para","dualsCorMatrix")
+              "TNI", "regulatoryElements","para","dualsCorMatrix")
     if(!is.character(para) || length(para)!=1 || !(para %in% opts))
       stop(paste("NOTE: 'what' should be any one of the options:", 
                  paste(opts,collapse = ", ") ), call.=FALSE)

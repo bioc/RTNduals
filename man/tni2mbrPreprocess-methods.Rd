@@ -6,19 +6,14 @@
 \alias{tni2mbrPreprocess}
 \title{A preprocessing function for objects of class MBR.}
 \usage{
-\S4method{tni2mbrPreprocess}{TNI}(TNI1, TNI2, regulatoryElements1 = NULL,
-  regulatoryElements2 = NULL, verbose = TRUE)
+\S4method{tni2mbrPreprocess}{TNI}(tni, regulatoryElements = NULL,
+  verbose = TRUE)
 }
 \arguments{
-\item{TNI1}{A 'TNI' class object.}
+\item{tni}{A 'TNI' class object.}
 
-\item{TNI2}{Optional 'TNI' class object}
-
-\item{regulatoryElements1}{A character vector specifying which 
-'TNI1' regulatory elements should be evaluated.}
-
-\item{regulatoryElements2}{Optional character vector specifying which 
-'TNI2' regulatory elements should be evaluated.}
+\item{regulatoryElements}{A character vector specifying which 
+'TNI' regulatory elements should be evaluated.}
 
 \item{verbose}{A single logical value specifying to display detailed messages 
 (when verbose=TRUE) or not (when verbose=FALSE).}
@@ -27,32 +22,22 @@
 An \linkS4class{MBR} object.
 }
 \description{
-This function converts one or two TNI class objects and into one MBR class object.
+This function converts a TNI class objects and into one MBR class object.
 }
 \examples{
 #--- load a dataset for demonstration
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
-tfs1 <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
+tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
 \dontrun{
 
-##--- compute a TNI for tfs1
-tni1 <- tni.constructor(expData=gexp, regulatoryElements=tfs1, rowAnnotation=annot)
-tni1 <-tni.permutation(tni1)
-tni1 <-tni.bootstrap(tni1)
-tni1 <-tni.dpi.filter(tni1)
-
-##--- compute a TNI for tfs2
-tni2 <- tni.constructor(expData=gexp, regulatoryElements=tfs2, rowAnnotation=annot)
-tni2 <-tni.permutation(tni2)
-tni2 <-tni.bootstrap(tni2)
-tni2 <-tni.dpi.filter(tni2)
+##--- compute a TNI for tfs
+tni <- tni.constructor(expData=gexp, regulatoryElements=tfs, rowAnnotation=annot)
 
 ##--- run tni2mbrPreprocess
-rmbr <- tni2mbrPreprocess(tni1, tni2)
+rmbr <- tni2mbrPreprocess(tni)
 }
 
 }

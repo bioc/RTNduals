@@ -21,12 +21,11 @@
 #' data("dt4rtn", package = "RTN")
 #' gexp <- dt4rtn$gexp
 #' annot <- dt4rtn$gexpIDs
-#' tfs1 <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-#' tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
+#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 #' 
 #' ##--- run mbrPreprocess
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
-#' regulatoryElements2=tfs2, rowAnnotation=annot)
+#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
+#' rowAnnotation=annot)
 #' 
 #' \dontrun{
 #' 
@@ -64,7 +63,7 @@ mbrPlotDuals <- function(object, duals.names, filepath=NULL,
   mbr_para <- mbrGet(object,"para")
   mbr_estimator <- mbr_para$MBR$association$estimator
   mbr_nper <- mbr_para$MBR$association$nPermutations
-  rtni <- .merge.tnis(object)
+  rtni <- mbrGet(object, "TNI")
   rtni_para <- tni.get(rtni, what="para")
   rtni_nper <- rtni_para$perm$nPermutations
   motifstb <- mbrGet(object, what="dualsCorrelation")
@@ -159,7 +158,7 @@ mbrPlotDuals <- function(object, duals.names, filepath=NULL,
   ##---start plot
   if(!is.null(filename)){
     pdf(file=paste(filename,".pdf",sep=""), height=3, width=3)
-    cexleg1 <- 0.6
+    cexleg1 <- 0.5
     cexleg2 <- 0.6
     cexleg3 <- 0.8
   } else {
@@ -220,26 +219,4 @@ mbrPlotDuals <- function(object, duals.names, filepath=NULL,
   annot<-rtni@rowAnnotation[nms,]
   report<-cbind(annot,format(round(xy,3)))
   invisible(report)
-}
-
-## merge tnis for 'mbrPlotDuals'
-.merge.tnis <- function (object){
-  TNI1 <- mbrGet(object, "TNI1")
-  TNI2 <- mbrGet(object, "TNI2")
-  elreg1 <- tni.get(TNI1, "regulatoryElements")
-  elreg2 <- tni.get(TNI2, "regulatoryElements")
-  elregs <- c(elreg1, elreg2)
-  elregs <- elregs[!duplicated(elregs)]
-  rtni_merge <- new("TNI",gexp = tni.get(TNI1, "gexp"), regulatoryElements = elregs)
-  rtni_merge@rowAnnotation <- object@TNI1@rowAnnotation
-  rtni_merge@para <- tni.get(TNI1, "para")
-  #---
-  tnet1 <- tni.get(TNI1, "refnet")[, elreg1]
-  tnet2 <- tni.get(TNI2, "refnet")[, setdiff(elreg2,elreg1)]
-  rtni_merge@results$tn.ref <- cbind(tnet1, tnet2)
-  tnet1 <- tni.get(TNI1, "tnet")[, elreg1]
-  tnet2 <- tni.get(TNI2, "tnet")[, setdiff(elreg2,elreg1)]
-  rtni_merge@results$tn.dpi <- cbind(tnet1, tnet2)
-  rtni_merge@status [1:4] <- "[x]"
-  return (rtni_merge)
 }

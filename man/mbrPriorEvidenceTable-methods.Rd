@@ -6,16 +6,16 @@
 \alias{mbrPriorEvidenceTable}
 \title{Entry point for external evidences.}
 \usage{
-\S4method{mbrPriorEvidenceTable}{MBR}(object, priorEvidenceTable = NULL,
-  evidenceColname = NULL, verbose = TRUE)
+\S4method{mbrPriorEvidenceTable}{MBR}(object, priorEvidenceTable,
+  evidenceColname, verbose = TRUE)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by the 
 method \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}.}
 
-\item{priorEvidenceTable}{An optional 'data.frame' with three columns 
-representing (1) regulatory elements of 'TNI1', (2) regulatory elements 
-of 'TNI2', and (3) external evidences between the regulatory elements.}
+\item{priorEvidenceTable}{An 'data.frame' with three columns 
+representing (1) regulatory elements 1, (2) regulatory elements 2,
+and (3) external evidences between the regulatory elements.}
 
 \item{evidenceColname}{A single character value specifying a column in 
 the 'priorEvidenceTable'.}
@@ -35,12 +35,11 @@ If available, this function adds external evidences to an 'MBR' object.
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
-tfs1 <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
+tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
 ##--- run mbrAssociation (set nPermutations>=1000 and nBootstrap>=100)
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
-regulatoryElements2=tfs2, rowAnnotation=annot)
+rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
+rowAnnotation=annot)
 rmbr <- mbrPermutation(rmbr, nPermutations=10)
 rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
 rmbr <- mbrDpiFilter(rmbr)

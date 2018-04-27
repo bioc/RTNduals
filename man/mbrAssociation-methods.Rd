@@ -6,10 +6,10 @@
 \alias{mbrAssociation}
 \title{Motifs analysis and inference of 'dual regulons'.}
 \usage{
-\S4method{mbrAssociation}{MBR}(object, regulatoryElements1 = NULL,
-  regulatoryElements2 = NULL, minRegulonSize = 15, pValueCutoff = 0.001,
-  pAdjustMethod = "BH", estimator = "spearman", nPermutations = 1000,
-  miFilter = TRUE, verbose = TRUE)
+\S4method{mbrAssociation}{MBR}(object, regulatoryElements = NULL,
+  minRegulonSize = 15, pValueCutoff = 0.001, pAdjustMethod = "BH",
+  estimator = "spearman", nPermutations = 1000, miFilter = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by the 
@@ -17,12 +17,8 @@ methods \code{\link[RTNduals:mbrPermutation]{mbrPermutation}},
 \code{\link[RTNduals:mbrBootstrap]{mbrBootstrap}} 
 and \code{\link[RTNduals:mbrDpiFilter]{mbrDpiFilter}}.}
 
-\item{regulatoryElements1}{An optional character vector specifying which 
-'TNI1' regulatory elements should be evaluated. If 'NULL' all regulatory 
-elements will be evaluated.}
-
-\item{regulatoryElements2}{An optional character vector specifying which 
-'TNI2' regulatory elements should be evaluated. If 'NULL' all regulatory 
+\item{regulatoryElements}{An optional character vector specifying which 
+'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 
 elements will be evaluated.}
 
 \item{minRegulonSize}{A single integer or numeric value specifying the 
@@ -61,12 +57,11 @@ downstream effects.
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
-tfs1 <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
+tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
 ##--- run mbrPreprocess
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
-regulatoryElements2=tfs2, rowAnnotation=annot)
+rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
+rowAnnotation=annot)
 
 ##--- run mbrPermutation (set nPermutations>=1000)
 rmbr <- mbrPermutation(rmbr, nPermutations=30)

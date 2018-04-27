@@ -13,10 +13,8 @@ setClassUnion("TNInull", members = c("TNI", "NULL"))
 #' regulator annotation, infered 'dual regulons' and parameters used in the analysis. 
 #' All the information is stored in nine slots.
 #' 
-#' @slot TNI1 a 'TNI' object created by the RTN package.
-#' @slot TNI2 another 'TNI' object created by the RTN package.
-#' @slot regulatoryElements1 regulatory elements listed in the TNI1.
-#' @slot regulatoryElements2 regulatory elements listed in the TNI2.
+#' @slot TNI a 'TNI' object created by the RTN package.
+#' @slot regulatoryElements regulatory elements listed in the TNI.
 #' @slot dualRegulons all possible 'duals regulons' computed by 
 #' \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}
 #' @slot results a list, results from the MBR methods.
@@ -42,20 +40,16 @@ setClassUnion("TNInull", members = c("TNI", "NULL"))
 setClass(
   "MBR",
   slots=c(
-    TNI1="TNInull",
-    TNI2="TNInull",
-    regulatoryElements1="character",
-    regulatoryElements2="character",
+    TNI="TNInull",
+    regulatoryElements="character",
     dualRegulons="character",
     results="list",
     para='list',
     summary='list',
     status="character"
   ), prototype=list(
-    TNI1=NULL,
-    TNI2=NULL,
-    regulatoryElements1=character(),
-    regulatoryElements2=character(),
+    TNI=NULL,
+    regulatoryElements=character(),
     dualRegulons=character(),
     results=list(),
     para=list(),

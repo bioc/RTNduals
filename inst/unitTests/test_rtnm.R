@@ -2,11 +2,10 @@
 test_mbr <- function()
 {
     data("dt4rtn", package = "RTN")
-    tfs1 <- dt4rtn$tfs[c("FOXM1", "E2F2")]
-    tfs2 <- dt4rtn$tfs[c("PTTG1", "RARA")]
+    tfs <- dt4rtn$tfs[c("FOXM1", "E2F2")]
     ##mbrPreprocess
-    rmbr <- mbrPreprocess(gexp=dt4rtn$gexp, regulatoryElements1=tfs1, 
-                           regulatoryElements2=tfs2, rowAnnotation=dt4rtn$gexpIDs)
+    rmbr <- mbrPreprocess(gexp=dt4rtn$gexp, regulatoryElements=tfs, 
+                          rowAnnotation=dt4rtn$gexpIDs)
     status <- mbrGet(rmbr, what="status")
     checkTrue(status[1]=="[x]")
     ##mbrPermutation
@@ -22,9 +21,8 @@ test_mbr <- function()
     status <- mbrGet(rmbr, what="status")
     checkTrue(status[4]=="[x]")
     ##mbr.combine.TNIs
-    tni1 <- mbrGet(rmbr, what="TNI1")
-    tni2 <- mbrGet(rmbr, what="TNI2")
-    rmbr <- tni2mbrPreprocess(tni1, tni2)
+    tni <- mbrGet(rmbr, what="TNI")
+    rmbr <- tni2mbrPreprocess(tni)
     status <- mbrGet(rmbr, what="status")
     checkTrue(all(status[1:4]=="[x]"))
     ##mbrAssociation
@@ -33,7 +31,6 @@ test_mbr <- function()
     dualsCorrelation <- mbrGet(rmbr, what="dualsCorrelation")
     checkTrue(status[5]=="[x]" && is.data.frame(dualsCorrelation) )
     ##mbr.motifs
-    rmbr <- mbrPriorEvidenceTable(rmbr)
     dualsCorrelation <- mbrGet(rmbr, what="dualsCorrelation")
     checkTrue(is.data.frame(dualsCorrelation))
 }

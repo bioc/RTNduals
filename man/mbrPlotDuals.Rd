@@ -31,12 +31,11 @@ This function plots the shared target clouds between a regulon pair.
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
-tfs1 <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
+tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
 ##--- run mbrPreprocess
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
-regulatoryElements2=tfs2, rowAnnotation=annot)
+rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
+rowAnnotation=annot)
 
 \dontrun{
 

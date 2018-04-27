@@ -18,13 +18,9 @@ All the information is stored in nine slots.
 \section{Slots}{
 
 \describe{
-\item{\code{TNI1}}{a 'TNI' object created by the RTN package.}
+\item{\code{TNI}}{a 'TNI' object created by the RTN package.}
 
-\item{\code{TNI2}}{another 'TNI' object created by the RTN package.}
-
-\item{\code{regulatoryElements1}}{regulatory elements listed in the TNI1.}
-
-\item{\code{regulatoryElements2}}{regulatory elements listed in the TNI2.}
+\item{\code{regulatoryElements}}{regulatory elements listed in the TNI.}
 
 \item{\code{dualRegulons}}{all possible 'duals regulons' computed by 
 \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}}

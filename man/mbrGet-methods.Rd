@@ -12,8 +12,8 @@
 \item{object}{A preprocessed object of class \linkS4class{MBR}}
 
 \item{what}{a single character value specifying which information should be 
-retrieved from the slots. Options: "TNI1", "TNI2", "regulatoryElements1", 
-"regulatoryElements2", "dualRegulons", "results", "para", "summary", 
+retrieved from the slots. Options: "TNI", "regulatoryElements", 
+"dualRegulons", "results", "para", "summary", 
 "status", "dualsCorrelation", "dualsOverlap", and "dualsCorMatrix"}
 }
 \value{
@@ -28,14 +28,13 @@ results from previous analysis.
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
-tfs1 <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-tfs2 <- dt4rtn$tfs[c("HCLS1","STAT4","STAT1","LMO4","ZNF552")]
+tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
 ##--- run mbrPreprocess
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements1 = tfs1, 
-regulatoryElements2=tfs2, rowAnnotation=annot)
+rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
+rowAnnotation=annot)
 
-##--- get the 'TNI1' slot using 'mbrGet'
-tni1 <- mbrGet(rmbr, what="TNI1")
+##--- get the 'TNI' slot using 'mbrGet'
+tni <- mbrGet(rmbr, what="TNI")
 
 }
