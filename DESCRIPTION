@@ -1,7 +1,7 @@
 Package: RTNduals
 Type: Package
 Title: Analysis of co-regulatory network motifs and inference of 'dual regulons'
-Version: 1.4.0
+Version: 1.5.0
 Author: Vinicius S. Chagas, Clarice S. Groeneveld, Gordon Robertson, Kerstin B. Meyer, Mauro A. A. Castro
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>, Clarice Groeneveld <clari.groeneveld@gmail.com>
 Depends: R (>= 3.4), methods, RTN(>= 2.3.6)
