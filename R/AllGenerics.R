@@ -14,7 +14,7 @@ setGeneric("mbrDpiFilter",
              standardGeneric("mbrDpiFilter"), package="RTNduals")
 setGeneric("mbrAssociation",
            function(object, regulatoryElements=NULL, minRegulonSize=15, 
-                    pValueCutoff=0.001, pAdjustMethod="BH", 
+                    pValueCutoff=0.001, pAdjustMethod="bonferroni", 
                     estimator='spearman', nPermutations=1000, 
                     miFilter=TRUE, verbose=TRUE)
              standardGeneric("mbrAssociation"), package="RTNduals")

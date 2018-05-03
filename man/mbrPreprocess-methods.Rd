@@ -20,7 +20,7 @@ values.}
 messages (when verbose=TRUE) or not (when verbose=FALSE).}
 
 \item{...}{Additional arguments passed on to 
-\code{\link[RTN:tni.preprocess]{tni.preprocess}} function.}
+\code{\link{tni.preprocess}} function.}
 }
 \value{
 A preprocessed 'MBR-class' object.

@@ -132,15 +132,12 @@
 ## number of genes expected to occur in both regulons, the actual observed overlap,
 ## and the pvalues. The test assesses the whether the intersect between refregulons
 ## is enriched with the high stringent dpi targets.
-.mbr.overlap <- function(statlist, regulons1, regulons2, refregulons1, 
-                         refregulons2, verbose=TRUE){
+.mbr.overlap <- function(statlist, regulons, refregulons, verbose=TRUE){
   regpairs <- statlist[, c("ID_regulon1", "ID_regulon2")]
-  ##get gene sets: used to test whether the intersect between refregulons 
+  ##get gene sets: used to test whether the intersect between refregulons
   ##is enriched with the high stringent dpi targets
-  interegulons <- .getInterRegulons(refregulons1, refregulons2,regulons1, regulons2)
-  interefegulons <- .getInterRefRegulons(refregulons1, refregulons2)
-  uniregulons <- .getUnionRegulons(regulons1, regulons2)
-  unirefegulons <- .getUnionRefRegulons(refregulons1, refregulons2)
+  interegulons <- .getInterRegulons(refregulons, regulons)
+  unirefegulons <- .getUnionRefRegulons(refregulons)
   if(verbose) pb<-txtProgressBar(style=3)
   res <- NULL
   for(i in 1:nrow(regpairs)) {
@@ -149,12 +146,16 @@
     ##---
     reg1 <- vecpairs[1]
     reg2 <- vecpairs[2]
+    sz_set1 <- length( regulons[[reg1]])
+    sz_set2 <- length( regulons[[reg2]])
     ##---
-    sz_overlap <- length( interegulons[[reg1]][[reg2]] )
-    sz_set1 <- length( interefegulons[[reg1]][[reg2]] )
-    sz_set2 <- length( uniregulons[[reg1]][[reg2]] )
-    #note: regulons are already conditioned to duals,
-    #so the universe is reduced to ref. regulons
+    if(sz_set1 <= sz_set2){
+      sz_overlap <- length( intersect(regulons[[reg1]], interegulons[[reg1]][[reg2]]) )
+    } else {
+      sz_overlap <- length( intersect(regulons[[reg2]], interegulons[[reg1]][[reg2]]) )
+    }
+    #note: regulons are already conditioned to pairs of regulators,
+    #so the universe is the ref. regulons
     sz_universe <- length( unirefegulons[[reg1]][[reg2]] )
     ##---
     tmp <- .regulon.hyper(sz_set1, sz_set2, sz_overlap, sz_universe)
@@ -177,60 +178,37 @@
   ex <- (n/N)*m
   if(m == 0 | n == 0) pvals <- 1
   results <- c(N, m, n, ex, k, pvals)
-  names(results) <- c("Universe.Size", "Intersect.Size", "Effect.Size",
+  names(results) <- c("Universe.Size", "Regulon1.Size", "Regulon2.Size",
                       "Expected.Overlap", "Observed.Overlap", "Pvalue")
   return(results)
 }
 
 ##------------------------------------------------------------------------------
 ## Map interactions for all potential dual regulons
-## (1) get a broad intersect between regulons (i.e. with refregulons)
-## (2) then put the focus on regulons of higher stringency
-.getInterRegulons <- function(refregulons1, refregulons2, regulons1, regulons2){
-  interegulons <- lapply(names(regulons1), function(r1){
-    inter <- lapply(names(regulons2), function(r2){
-      reftar12 <- intersect(refregulons1[[r1]],refregulons2[[r2]])
-      tar12 <- union(regulons1[[r1]],regulons2[[r2]])
+## (1) get a broad intersect between regulons (i.e. refregulons)
+## (2) then put the focus on targets of higher stringency
+.getInterRegulons <- function(refregulons, regulons){
+  interegulons <- lapply(names(regulons), function(r1){
+    inter <- lapply(names(regulons), function(r2){
+      reftar12 <- intersect(refregulons[[r1]],refregulons[[r2]])
+      tar12 <- union(regulons[[r1]],regulons[[r2]])
       intersect(tar12,reftar12)
     })
-    names(inter) <- names(regulons2)
+    names(inter) <- names(regulons)
     inter
   })
-  names(interegulons) <- names(regulons1)
+  names(interegulons) <- names(regulons)
   return(interegulons)
 }
-## .. and here only gets the broad intersect with refregulons
-.getInterRefRegulons <- function(refregulons1, refregulons2){
-  interefegulons <- lapply(names(refregulons1), function(r1){
-    inter <- lapply(names(refregulons2), function(r2){
-      intersect(refregulons1[[r1]],refregulons2[[r2]])
+.getUnionRefRegulons <- function(refregulons){
+  interefegulons <- lapply(names(refregulons), function(r1){
+    inter <- lapply(names(refregulons), function(r2){
+      union(refregulons[[r1]],refregulons[[r2]])
     })
-    names(inter) <- names(refregulons2)
+    names(inter) <- names(refregulons)
     inter
   })
-  names(interefegulons) <- names(refregulons1)
-  return(interefegulons)
-}
-.getUnionRegulons <- function(regulons1, regulons2){
-  interefegulons <- lapply(names(regulons1), function(r1){
-    inter <- lapply(names(regulons2), function(r2){
-      union(regulons1[[r1]],regulons2[[r2]])
-    })
-    names(inter) <- names(regulons2)
-    inter
-  })
-  names(interefegulons) <- names(regulons1)
-  return(interefegulons)
-}
-.getUnionRefRegulons <- function(refregulons1, refregulons2){
-  interefegulons <- lapply(names(refregulons1), function(r1){
-    inter <- lapply(names(refregulons2), function(r2){
-      union(refregulons1[[r1]],refregulons2[[r2]])
-    })
-    names(inter) <- names(refregulons2)
-    inter
-  })
-  names(interefegulons) <- names(refregulons1)
+  names(interefegulons) <- names(refregulons)
   return(interefegulons)
 }
 

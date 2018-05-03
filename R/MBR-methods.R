@@ -46,7 +46,7 @@
 #' @param verbose A single logical value specifying to display detailed 
 #' messages (when verbose=TRUE) or not (when verbose=FALSE).
 #' @param ... Additional arguments passed on to 
-#' \code{\link[RTN:tni.preprocess]{tni.preprocess}} function.
+#' \code{\link{tni.preprocess}} function.
 #' @return A preprocessed 'MBR-class' object.
 #' @examples
 #' ##--- load a dataset for demonstration
@@ -108,7 +108,7 @@ setMethod("mbrPreprocess",
 #' @param verbose A single logical value specifying to display detailed 
 #' messages (when verbose=TRUE) or not (when verbose=FALSE).
 #' @param ... Additional arguments passed on to the 
-#' \code{\link[RTN:tni.permutation]{tni.permutation}} function.
+#' \code{\link{tni.permutation}} function.
 #' @return An \linkS4class{MBR} object with two mutual information matrices, 
 #' one in each "TNI" slot.
 #' @examples
@@ -177,11 +177,11 @@ setMethod("mbrPermutation",
 #' networks.
 #'
 #' @param object A processed objec of class \linkS4class{MBR} evaluated by the 
-#' method \code{\link[RTNduals:mbrPermutation]{mbrPermutation}}.
+#' method \code{\link{mbrPermutation}}.
 #' @param verbose A single logical value specifying to display detailed 
 #' messages (when verbose=TRUE) or not (when verbose=FALSE).
 #' @param ... Additional arguments passed to the 
-#' \code{\link[RTN:tni.bootstrap]{tni.bootstrap}} function.
+#' \code{\link{tni.bootstrap}} function.
 #' @return An \linkS4class{MBR} object with two consensus mutual information 
 #' matrices, one in each "TNI" slot.
 #' @examples
@@ -258,12 +258,12 @@ setMethod("mbrBootstrap",
 #'
 #' @param object A processed object of class \linkS4class{MBR} evaluated by 
 #' the methods
-#'  \code{\link[RTNduals:mbrPermutation]{mbrPermutation}} and 
-#'  \code{\link[RTNduals:mbrBootstrap]{mbrBootstrap}}.
+#'  \code{\link{mbrPermutation}} and 
+#'  \code{\link{mbrBootstrap}}.
 #' @param verbose A single logical value specifying to display detailed 
 #' messages (when verbose=TRUE) or not (when verbose=FALSE).
 #' @param ... Additional arguments passed to the 
-#' \code{\link[RTN:tni.dpi.filter]{tni.dpi.filter}} function.
+#' \code{\link{tni.dpi.filter}} function.
 #' @return An \linkS4class{MBR} object with two DPI-filtered mutual information 
 #' matrices, one in each "TNI" slot.
 #' @examples
@@ -342,9 +342,8 @@ setMethod("mbrDpiFilter",
 #' downstream effects.
 #'
 #' @param object A processed object of class \linkS4class{MBR} evaluated by the 
-#' methods \code{\link[RTNduals:mbrPermutation]{mbrPermutation}}, 
-#' \code{\link[RTNduals:mbrBootstrap]{mbrBootstrap}} 
-#' and \code{\link[RTNduals:mbrDpiFilter]{mbrDpiFilter}}.
+#' methods \code{\link{mbrPermutation}}, 
+#' \code{\link{mbrBootstrap}} and \code{\link{mbrDpiFilter}}.
 #' @param regulatoryElements An optional character vector specifying which 
 #' 'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 
 #' elements will be evaluated.
@@ -403,8 +402,9 @@ setMethod("mbrDpiFilter",
 setMethod("mbrAssociation",
           "MBR",
           function(object, regulatoryElements=NULL, minRegulonSize=15, 
-                   pValueCutoff=0.001, pAdjustMethod="BH", estimator="spearman", 
-                   nPermutations=1000, miFilter=TRUE, verbose=TRUE){
+                   pValueCutoff=0.001, pAdjustMethod="bonferroni", 
+                   estimator="spearman", nPermutations=1000, 
+                   miFilter=TRUE, verbose=TRUE){
             ##--- input check
             if(object@status["Preprocess"]!="[x]")
               stop("NOTE: MBR object is not complete: requires preprocessing!")
@@ -476,7 +476,7 @@ setMethod("mbrAssociation",
                                 asInteger=FALSE, mapAssignedAssociation=FALSE)
             
             ##--- map interactions for all potential dual regulons
-            interegulons <- .getInterRegulons(refregulons, refregulons, regulons, regulons)
+            interegulons <- .getInterRegulons(refregulons, regulons)
             
             ##--- compute correlation between regulons
             ## the transformation with double 'cor' calls combines the two distributions
@@ -520,8 +520,7 @@ setMethod("mbrAssociation",
               if(verbose) {
                 cat("-Assessing overlap between regulons...\n")
               }
-              overlapStats <- .mbr.overlap(statlist, regulons, regulons, refregulons, 
-                                           refregulons, verbose)
+              overlapStats <- .mbr.overlap(statlist, regulons, refregulons, verbose)
               ##--- adjust Pvalue for n.tests
               overlapStats$Adjusted.Pvalue <- p.adjust(overlapStats$Pvalue, 
                                                        method=pAdjustMethod, n=n.tests )
@@ -564,7 +563,7 @@ setMethod("mbrAssociation",
             ##--- organize results
             predictedDuals <- nrow(statlist)
             if(predictedDuals>0){
-              labs <- c("Regulon1","Regulon2", "Universe.Size", "Intersect.Size", "Effect.Size",
+              labs <- c("Regulon1","Regulon2", "Universe.Size", "Regulon1.Size", "Regulon2.Size",
                         "Expected.Overlap","Observed.Overlap","Pvalue", "Adjusted.Pvalue")
               overlapStats <- overlapStats[,labs]
               labs <- c("Regulon1","Regulon2", "MI.Regulators", "R.Regulons", 
@@ -575,8 +574,8 @@ setMethod("mbrAssociation",
                       call.=FALSE)
               nm <- as.numeric()
               ch <- as.numeric()
-              overlapStats <- data.frame(Regulon1=ch, egulon2=ch, Universe.Size=nm, Intersect.Size=nm, 
-                                         Effect.Size=nm, Expected.Overlap=nm, Observed.Overlap=nm,
+              overlapStats <- data.frame(Regulon1=ch, egulon2=ch, Universe.Size=nm, Regulon1.Size=nm, 
+                                         Regulon2.Size=nm, Expected.Overlap=nm, Observed.Overlap=nm,
                                          Pvalue=nm, Adjusted.Pvalue=nm)
               corrStats <- data.frame(Regulon1=ch, Regulon2=ch, MI.Regulators=nm, 
                                       R.Regulons=nm, Pvalue=nm, Adjusted.Pvalue=nm)
@@ -618,7 +617,7 @@ setMethod("mbrAssociation",
 #' If available, this function adds external evidences to an 'MBR' object.
 #'
 #' @param object A processed object of class \linkS4class{MBR} evaluated by the 
-#' method \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}.
+#' method \code{\link{mbrAssociation}}.
 #' @param priorEvidenceTable An 'data.frame' with three columns 
 #' representing (1) regulatory elements 1, (2) regulatory elements 2,
 #' and (3) external evidences between the regulatory elements.

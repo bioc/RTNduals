@@ -10,13 +10,13 @@
 }
 \arguments{
 \item{object}{A processed objec of class \linkS4class{MBR} evaluated by the 
-method \code{\link[RTNduals:mbrPermutation]{mbrPermutation}}.}
+method \code{\link{mbrPermutation}}.}
 
 \item{verbose}{A single logical value specifying to display detailed 
 messages (when verbose=TRUE) or not (when verbose=FALSE).}
 
 \item{...}{Additional arguments passed to the 
-\code{\link[RTN:tni.bootstrap]{tni.bootstrap}} function.}
+\code{\link{tni.bootstrap}} function.}
 }
 \value{
 An \linkS4class{MBR} object with two consensus mutual information 

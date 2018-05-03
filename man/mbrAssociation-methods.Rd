@@ -7,15 +7,14 @@
 \title{Motifs analysis and inference of 'dual regulons'.}
 \usage{
 \S4method{mbrAssociation}{MBR}(object, regulatoryElements = NULL,
-  minRegulonSize = 15, pValueCutoff = 0.001, pAdjustMethod = "BH",
+  minRegulonSize = 15, pValueCutoff = 0.001, pAdjustMethod = "bonferroni",
   estimator = "spearman", nPermutations = 1000, miFilter = TRUE,
   verbose = TRUE)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by the 
-methods \code{\link[RTNduals:mbrPermutation]{mbrPermutation}}, 
-\code{\link[RTNduals:mbrBootstrap]{mbrBootstrap}} 
-and \code{\link[RTNduals:mbrDpiFilter]{mbrDpiFilter}}.}
+methods \code{\link{mbrPermutation}}, 
+\code{\link{mbrBootstrap}} and \code{\link{mbrDpiFilter}}.}
 
 \item{regulatoryElements}{An optional character vector specifying which 
 'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 

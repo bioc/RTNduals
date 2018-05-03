@@ -15,7 +15,7 @@
 messages (when verbose=TRUE) or not (when verbose=FALSE).}
 
 \item{...}{Additional arguments passed on to the 
-\code{\link[RTN:tni.permutation]{tni.permutation}} function.}
+\code{\link{tni.permutation}} function.}
 }
 \value{
 An \linkS4class{MBR} object with two mutual information matrices, 

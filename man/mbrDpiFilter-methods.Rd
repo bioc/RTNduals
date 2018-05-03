@@ -11,14 +11,14 @@
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by 
 the methods
- \code{\link[RTNduals:mbrPermutation]{mbrPermutation}} and 
- \code{\link[RTNduals:mbrBootstrap]{mbrBootstrap}}.}
+ \code{\link{mbrPermutation}} and 
+ \code{\link{mbrBootstrap}}.}
 
 \item{verbose}{A single logical value specifying to display detailed 
 messages (when verbose=TRUE) or not (when verbose=FALSE).}
 
 \item{...}{Additional arguments passed to the 
-\code{\link[RTN:tni.dpi.filter]{tni.dpi.filter}} function.}
+\code{\link{tni.dpi.filter}} function.}
 }
 \value{
 An \linkS4class{MBR} object with two DPI-filtered mutual information 

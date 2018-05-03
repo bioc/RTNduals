@@ -66,6 +66,12 @@ mbr.checks <- function(name, para, paraSuppl){
            call.=FALSE)
   }
   ##---
+  else if(name == "dualreg.name"){
+    if(!is.singleString(para))
+      stop("NOTE: 'dualreg.name' should be a single string!", 
+           call.=FALSE)
+  }
+  ##---
   else if(name == "filepath") {
     if(!is.null(para)){
       if(!is.singleString(para) || !dir.exists(para))

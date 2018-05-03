@@ -9,9 +9,8 @@
 #'
 #' @param object A processed object of class \linkS4class{MBR} evaluated by 
 #' the method \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}.
-#' @param duals.names A character string indicating the file path where the plot 
-#' should be saved.
-#' @param filepath A character string indicating the file path where the plot 
+#' @param dualreg.name A string indicating the name of a dual regulon.
+#' @param filepath A string indicating the file path where the plot 
 #' should be saved.
 #' @param ptcols A vector of length 2 indicating colors of negative 
 #' and positive correlations, respectively.
@@ -43,7 +42,7 @@
 #'
 #' ##--- get inferred duals and plot the shared cloud of targets
 #' duals <- mbrGet(rmbr, what="dualRegulons")
-#' mbrPlotDuals(rmbr, duals.names=duals[1])
+#' mbrPlotDuals(rmbr, dualreg.name=duals[1])
 #'
 #'}
 #' @importFrom grDevices adjustcolor dev.off pdf colorRampPalette col2rgb
@@ -52,11 +51,11 @@
 #' @export
 
 ##------------------------------------------------------------------------------
-mbrPlotDuals <- function(object, duals.names, filepath=NULL, 
+mbrPlotDuals <- function(object, dualreg.name, filepath=NULL, 
                          ptcols=c("#006400FF","#CD6600FF")){
   ##----check object class
   mbr.checks(name="object", para=object)
-  mbr.checks(name="duals.names", para=duals.names)
+  mbr.checks(name="dualreg.name", para=dualreg.name)
   mbr.checks(name="filepath", para=filepath)
   mbr.checks(name="ptcols", para=ptcols)
   ##---
@@ -66,30 +65,33 @@ mbrPlotDuals <- function(object, duals.names, filepath=NULL,
   rtni <- mbrGet(object, "TNI")
   rtni_para <- tni.get(rtni, what="para")
   rtni_nper <- rtni_para$perm$nPermutations
-  motifstb <- mbrGet(object, what="dualsCorrelation")
-  if(!duals.names%in%rownames(motifstb)){
-    tp <- unlist(strsplit(duals.names, split = "~", fixed=TRUE))
-    duals.names <- paste(tp[2:1], collapse = "~")
-    if(!duals.names%in%rownames(motifstb)){
-      stop("NOTE: all 'duals.names' should be listed in 'dualsCorrelation' table!\nsee 'mbrGet' function. \n", call.=FALSE)
+  dualstb <- mbrGet(object, what="dualsCorrelation")
+  if(!dualreg.name%in%rownames(dualstb)){
+    tp <- unlist(strsplit(dualreg.name, split = "~", fixed=TRUE))
+    dualreg.name <- paste(tp[2:1], collapse = "~")
+    if(!dualreg.name%in%rownames(dualstb)){
+      stop("NOTE: all 'dualreg.name' should be listed in 'dualsCorrelation' table!\nsee 'mbrGet' function. \n", call.=FALSE)
     }
+    dualstb <- dualstb[dualreg.name,]
+    reg1 <- dualstb$Regulon2
+    reg2 <- dualstb$Regulon1
+  } else {
+    dualstb <- dualstb[dualreg.name,]
+    reg1 <- dualstb$Regulon1
+    reg2 <- dualstb$Regulon2
   }
-  motifstb <- motifstb[duals.names,]
-  for(i in 1:nrow(motifstb)){
-    reg1 <- motifstb$Regulon1[i]
-    reg2 <- motifstb$Regulon2[i]
-    r_val <- motifstb$R.Regulons
-    r_adjpval <- motifstb$Adjusted.Pvalue
-    if(!is.null(filepath)){
-      filename <- paste("dual_", reg1,"_vs_" ,reg2, sep="")
-      filename <- paste(path.expand(filepath), filename, sep="/")
-    } else {
-      filename <- NULL
-    }
-    .tni.plot.greement(rtni=rtni, duals=c(reg1, reg2), r_val=r_val, r_adjpval=r_adjpval, 
-                       filename=filename, ptcols=ptcols, mbr_estimator=mbr_estimator,
-                       mbr_nper=mbr_nper, rtni_nper=rtni_nper)
+  r_val <- dualstb$R.Regulons
+  r_adjpval <- dualstb$Adjusted.Pvalue
+  #---
+  if(!is.null(filepath)){
+    filename <- paste("dual_", reg1,"_vs_" ,reg2, sep="")
+    filename <- paste(path.expand(filepath), filename, sep="/")
+  } else {
+    filename <- NULL
   }
+  .tni.plot.greement(rtni=rtni, duals=c(reg1, reg2), r_val=r_val, r_adjpval=r_adjpval, 
+                     filename=filename, ptcols=ptcols, mbr_estimator=mbr_estimator,
+                     mbr_nper=mbr_nper, rtni_nper=rtni_nper)
 }
 
 ##------------------------------------------------------------------------------

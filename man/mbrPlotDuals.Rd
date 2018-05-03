@@ -4,17 +4,16 @@
 \alias{mbrPlotDuals}
 \title{Plot shared target clouds between dual regulons.}
 \usage{
-mbrPlotDuals(object, duals.names, filepath = NULL, ptcols = c("#006400FF",
+mbrPlotDuals(object, dualreg.name, filepath = NULL, ptcols = c("#006400FF",
   "#CD6600FF"))
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by 
 the method \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}.}
 
-\item{duals.names}{A character string indicating the file path where the plot 
-should be saved.}
+\item{dualreg.name}{A string indicating the name of a dual regulon.}
 
-\item{filepath}{A character string indicating the file path where the plot 
+\item{filepath}{A string indicating the file path where the plot 
 should be saved.}
 
 \item{ptcols}{A vector of length 2 indicating colors of negative 
@@ -53,7 +52,7 @@ rmbr <- mbrAssociation(rmbr, nPermutations=1000)
 
 ##--- get inferred duals and plot the shared cloud of targets
 duals <- mbrGet(rmbr, what="dualRegulons")
-mbrPlotDuals(rmbr, duals.names=duals[1])
+mbrPlotDuals(rmbr, dualreg.name=duals[1])
 
 }
 }
