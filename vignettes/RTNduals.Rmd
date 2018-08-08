@@ -123,8 +123,8 @@ mbrGet(rmbr, what="summary")
 
 ```{r eval=TRUE}
 ##--- get results
-mbrGet(rmbr, what="dualsOverlap")
-mbrGet(rmbr, what="dualsCorrelation")
+overlap <- mbrGet(rmbr, what="dualsOverlap")
+correlation <- mbrGet(rmbr, what="dualsCorrelation")
 ```
 
 Also, when prior evidences are available this method can add a 'supplementaryTable' regarding the association between regulators. The 'supplementaryTable' is a 'data.frame' listing unique relationships between any two regulators (please refer to the documentation for details on the input data format).

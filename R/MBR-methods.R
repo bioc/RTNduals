@@ -350,6 +350,8 @@ setMethod("mbrDpiFilter",
 #' @param minRegulonSize A single integer or numeric value specifying the 
 #' minimum number of elements in a regulon. Gene sets with fewer than this 
 #' number are removed from the analysis.
+#' @param doSizeFilter a logical value. If TRUE, negative and positive targets are 
+#' independently verified by the 'minRegulonSize' argument.
 #' @param pValueCutoff a single numeric value specifying the cutoff for p-values 
 #' considered significant.
 #' @param pAdjustMethod A single character value specifying the p-value 
@@ -402,9 +404,9 @@ setMethod("mbrDpiFilter",
 setMethod("mbrAssociation",
           "MBR",
           function(object, regulatoryElements=NULL, minRegulonSize=15, 
-                   pValueCutoff=0.001, pAdjustMethod="bonferroni", 
-                   estimator="spearman", nPermutations=1000, 
-                   miFilter=TRUE, verbose=TRUE){
+                   doSizeFilter=FALSE,  pValueCutoff=0.001, 
+                   pAdjustMethod="bonferroni", estimator="spearman", 
+                   nPermutations=1000, miFilter=TRUE, verbose=TRUE){
             ##--- input check
             if(object@status["Preprocess"]!="[x]")
               stop("NOTE: MBR object is not complete: requires preprocessing!")
@@ -418,6 +420,7 @@ setMethod("mbrAssociation",
             tni_para <- tni.get(tni, what="para")
             ##--- checks
             mbr.checks(name="minRegulonSize", para=minRegulonSize)
+            mbr.checks(name="doSizeFilter",para=doSizeFilter)
             mbr.checks(name="estimator", para=estimator)
             mbr.checks(name="pValueCutoff", para=pValueCutoff)
             mbr.checks(name="pAdjustMethod", para=pAdjustMethod)
@@ -430,35 +433,52 @@ setMethod("mbrAssociation",
             if(is.null(regulatoryElements)) {
               regulatoryElements <- tni.get(tni, "regulatoryElements")
             } else {
+              mbr.checks(name="regulatoryElements", para=regulatoryElements)
               regulatoryElements <- .checkRegel(tni, regulatoryElements)
-            } 
+            }
             mbr.checks(name="numberRegElements", para=regulatoryElements)
             
-            ##--- get all regulons (from tnet)
+            ##--- get all regulons (from tni)
+            regulonsAndMode <- tni.get(tni, what="regulons.and.mode")
             regulons <- tni.get(tni, what="regulons")
             refregulons <- tni.get(tni, what="refregulons")
             
-            ##--- get selected regulons
+            ##--- get regulons for 'regulatoryElements'
+            regulonsAndMode <- regulonsAndMode[regulatoryElements]
             regulons <- regulons[regulatoryElements]
-            size <- sapply(regulons, length)
-        
-            ##--- check size
-            if( sum(size>=minRegulonSize)==0) {
-              stop("NOTE: at least one regulon should be above the 
-                   'minRegulonSize'!",call.=FALSE)
+            refregulons <- refregulons[regulatoryElements]
+            
+            ##-----check regulon size (both clouds)
+            gs.size.max <- unlist(lapply(regulonsAndMode, function(reg){
+              max(sum(reg>0),sum(reg<0))
+            }))
+            gs.size.min <- unlist(lapply(regulonsAndMode, function(reg){
+              min(sum(reg>0),sum(reg<0))
+            }))
+            ##-----stop when no subset passes the size requirement
+            if(all(gs.size.max<minRegulonSize)){
+              stop(paste("NOTE: no partial regulon has minimum >= ", minRegulonSize, sep=""))
             }
-            ##--- filter those smaller than minRegulonSize
-            idx <- size >= (minRegulonSize)
-            regulons <- regulons[idx]
-            regulatoryElements <- regulatoryElements[idx]
-            size <- size[idx]
+            ##-----get filtered list
+            if(doSizeFilter){
+              regulatoryElements<-regulatoryElements[which(gs.size.min>=minRegulonSize)]
+              if(length(regulatoryElements)<2){
+                stop("NOTE: at least two regulons have to pass the 'doSizeFilter' requirement!")
+              }
+            } else {
+              regulatoryElements<-regulatoryElements[which(gs.size.max>=minRegulonSize)]
+              if(length(regulatoryElements)<2){
+                stop("NOTE: at least two regulons have to pass the 'minRegulonSize' requirement!")
+              }
+            }
             ##---
+            regulonsAndMode <- regulonsAndMode[regulatoryElements]
+            regulons <- regulons[regulatoryElements]
             refregulons <- refregulons[regulatoryElements]
             
             ##--- group of regulons and regulatory elements
-            regel <- unique(regulatoryElements)
             targets <- unique(c(unlist(regulons)))
-            targets <- unique(c(regel, targets))
+            targets <- unique(c(regulatoryElements, targets))
             
             ##--- get mi from refnet
             if(verbose) {
@@ -518,7 +538,9 @@ setMethod("mbrAssociation",
               
               ##--- assessing overlap between regulons using 'interegulons'
               if(verbose) {
-                cat("-Assessing overlap between regulons...\n")
+                tp <- paste("-Assessing overlap between",
+                            length(regulons),"regulons...\n")
+                cat(tp)
               }
               overlapStats <- .mbr.overlap(statlist, regulons, refregulons, verbose)
               ##--- adjust Pvalue for n.tests
@@ -529,7 +551,9 @@ setMethod("mbrAssociation",
               
               ##--- running permutation on R.Regulons
               if(verbose) {
-                cat("-Assessing correlation between regulons...\n")
+                tp <- paste("-Assessing correlation between",
+                            length(regulons),"regulons...\n")
+                cat(tp)
               }
               
               if(nrow(statlist) > 0){
@@ -809,7 +833,7 @@ setMethod( "show",
 #' retrieved from the slots. Options: "TNI", "regulatoryElements", 
 #' "dualRegulons", "results", "para", "summary", 
 #' "status", "dualsCorrelation", "dualsOverlap", and "dualsCorMatrix"
-#' @return A slot content from a object of class 'MBR' \linkS4class{MBR} object
+#' @return Content from slots in the \linkS4class{MBR} object
 #' @examples
 #' ##--- load a dataset for demonstration
 #' data("dt4rtn", package = "RTN")
