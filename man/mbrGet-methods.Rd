@@ -17,7 +17,7 @@ retrieved from the slots. Options: "TNI", "regulatoryElements",
 "status", "dualsCorrelation", "dualsOverlap", and "dualsCorMatrix"}
 }
 \value{
-A slot content from a object of class 'MBR' \linkS4class{MBR} object
+Content from slots in the \linkS4class{MBR} object
 }
 \description{
 Get information from individual slots in an MBR object and any available 

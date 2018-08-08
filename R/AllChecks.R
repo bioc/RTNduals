@@ -8,7 +8,6 @@ mbr.checks <- function(name, para, paraSuppl){
                   "and samples on cols!")
       stop(tp, call.=FALSE)
     }
-    ##---
     else if(is.null(rownames(para)) || is.null(colnames(para)) || 
        length(unique(rownames(para))) < length(rownames(para)) || 
        length(unique(colnames(para))) < length(colnames(para))){
@@ -17,7 +16,6 @@ mbr.checks <- function(name, para, paraSuppl){
       stop(tp, call.=FALSE)
     }
   }
-  ##---
   else if(name == "regulatoryElements"){
     if( !is.character(para) || any(is.na(para)) || 
         any(para == "") || is.null(para)  ){
@@ -29,86 +27,161 @@ mbr.checks <- function(name, para, paraSuppl){
       stop("NOTE: 'regulatoryElements' should have unique identifiers!", 
            call.=FALSE)
   }
-  ##---
   else if(name=="object"){
     if(class(para) != 'MBR')
       stop("NOTE: 'object' should be a 'MBR' class object", call.=FALSE)
   }
-  ##---
+  else if(name=="doSizeFilter"){
+    if(!is.singleLogical(para))
+      stop("NOTE: 'doSizeFilter' should be a logical value!", call.=FALSE)
+  }
+  else if(name=="zlog"){
+    if(!is.singleLogical(para))
+      stop("NOTE: 'zlog' should be a logical value!", call.=FALSE)
+  }
+  else if(name=="model"){
+    tp <- c("lm", "glm", "coxph")
+    if( sum(tp %in% class(para))==0 )
+      stop("NOTE: 'model' object should be of class 'lm', 'glm' or 'coxph'!", 
+           call.=FALSE)
+  }
+  else if(name=="showdata"){
+    if(!is.singleLogical(para))
+      stop("NOTE: 'showdata' should be a logical value!", call.=FALSE)
+  }
   else if(name=="verbose"){
     if(!is.singleLogical(para))
       stop("NOTE: 'verbose' should be a logical value!", call.=FALSE)
   }
-  ##---
   else if(name=="miFilter"){
     if(!is.singleLogical(para))
       stop("NOTE: 'miFilter' should be a logical value!", call.=FALSE)
   }
-  ##---
   else if(name == "minRegulonSize"){
     if(!is.singleNumber(para) || !para>0)
-      stop("NOTE: 'minRegulonSize' should be numeric value > 0", call.=FALSE)
+      stop("NOTE: 'minRegulonSize' should be a numeric value > 0", call.=FALSE)
   }
-  ##---
   else if(name=="nPermutations") {
-    if(!(is.integer(para) || is.numeric(para)) || length(para)!=1 || para<1 || round(para,0)!=para)
+    if(!is.singleInteger(para) || length(para)!=1 || para<1)
       stop("'nPermutations' should be an integer >=1 !",call.=FALSE)
   }
-  ##---
   else if(name == "pCutoff"){
     if(!is.singleNumber(para) || (!para>=0) && (!para<=1))
       stop("NOTE: 'pCutoff' should be a numeric value >= 0 and <= 1!", call.=FALSE)
   }
-  ##---
   else if(name == "estimator"){
     if(!is.singleString(para) || !para %in% c("spearman", "kendall", "pearson"))
       stop("NOTE: 'estimator' should be one of 'spearman', 'kendall', 'pearson'!", 
            call.=FALSE)
   }
-  ##---
+  else if(name == "dualreg"){
+    if(!is.singleString(para))
+      stop("NOTE: 'dualreg' should be a single string!", 
+           call.=FALSE)
+  }
   else if(name == "filepath") {
     if(!is.null(para)){
       if(!is.singleString(para) || !dir.exists(para))
         stop("NOTE: 'filepath' should be a valid single path name!", call.=FALSE)
     }
   }
-  ##---
-  else if(name == "names.duals") {
-    if(!all.characterValues(para))
-      stop("NOTE: 'names.duals' should of character vector!", 
-           call.=FALSE)
-  }
-  ##---
-  else if(name == "ptcols") {
-    if(!is.color(para) || length(para)!=2)
-      stop("NOTE: 'ptcols' should of a vector (length = 2) with valid colors!", 
-           call.=FALSE)
-  }
-  ##---
-  else if(name == "regulatoryElements"){
-    if(!all.characterValues(para) || any(duplicated(para)) ){
-      stop("NOTE: 'regulatoryElements' should be unique character values !", call. = FALSE)
+  else if(name == "fpath") {
+    if(!is.null(para)){
+      if(!is.singleString(para) || !dir.exists(para))
+        stop("NOTE: 'fpath' should be a valid single path name!", call.=FALSE)
     }
   }
-  ##---
-  else if(name=="numberRegElements"){
-    if(length(para)==0)
-      stop("NOTE: at least 1 regulatory element should be listed in both 'regulatoryElements'!", 
+  else if (name == "fname"){
+    if (!is.singleString(para)) 
+      stop("'fname' must be a single character.", call. = FALSE)
+    #---check name
+    validname <- gsub("[^0-9A-Za-z\\.]", '_',para)
+    if(validname!=para){
+      stop("NOTE: please provide 'fname' without special charaters or path information!",
+           call. = FALSE)
+    }
+  }
+  else if (name == "width"){
+    if (!is.singleNumber(para)) 
+      stop("'width' must be a single numeric values.", call. = FALSE)
+  }
+  else if (name == "height"){
+    if (!is.singleNumber(para)) 
+      stop("'height' must be a single numeric values.", call. = FALSE)
+  }
+  else if(name == "cols"){
+    if(!is.color(para))
+      stop("NOTE: 'cols' should be a vector with valid colors!", 
            call.=FALSE)
   }
-  ##---
+  else if(name == "datacols"){
+    if(!is.color(para))
+      stop("NOTE: 'datacols' should be a vector with valid colors!", 
+           call.=FALSE)
+  }
+  else if(name == "zcols") {
+    if(!is.color(para) || length(para)!=2)
+      stop("NOTE: 'zcols' should be a vector (length = 2) with valid colors!", 
+           call.=FALSE)
+  }
+  else if(name == "ycols") {
+    if(!is.color(para) || length(para)!=2)
+      stop("NOTE: 'ycols' should be a vector (length = 2) with valid colors!", 
+           call.=FALSE)
+  }
+  else if(name == "regulatoryElements"){
+    if(!all.characterValues(para) || any(duplicated(para)) ){
+      stop("NOTE: 'regulatoryElements' should be a character vector with unique values !", call. = FALSE)
+    }
+  } 
+  else if(name == "vars"){
+    if(!all.characterValues(para) || any(duplicated(para)) || length(para)!=2 ){
+      stop("NOTE: 'vars' should be a character vector (length = 2) with unique values!", call. = FALSE)
+    }
+  }
+  else if (name == "xlim"){
+    if (!is.numeric(para) || length(para) != 2) 
+      stop("'xlim' must be a numeric vector of length 2.", call. = FALSE)
+  } 
+  else if (name == "ylim"){
+    if (!is.numeric(para) || length(para) != 2) 
+      stop("'ylim' must be a numeric vector of length 2.", call. = FALSE)
+  } 
+  else if (name == "zlim"){
+    if (!is.numeric(para) || length(para) != 2) 
+      stop("'zlim' must be a numeric vector of length 2.", call. = FALSE)
+  } 
+  else if (name == "zcenter"){
+    if (!is.singleNumber(para)) 
+      stop("'zcenter' must be a single numeric value.", call. = FALSE)
+  } 
+  else if (name == "ylab"){
+    if (!is.singleString(para)) 
+      stop("'ylab' must be a single character.", call. = FALSE)
+  } 
+  else if (name == "xlab"){
+    if (!is.singleString(para)) 
+      stop("'xlab' must be a single character.", call. = FALSE)
+  }
+  else if (name == "zlab"){
+    if (!is.singleString(para)) 
+      stop("'zlab' must be a single character.", call. = FALSE)
+  }
+  else if(name=="numberRegElements"){
+    if(length(para)==0)
+      stop("NOTE: at least 1 regulatory element should be listed in 'regulatoryElements'!", 
+           call.=FALSE)
+  }
   else if(name=="pValueCutoff") {
-    if(!(is.integer(para) || is.numeric(para)) || length(para)!=1 || para>1 || para<0)
+    if(!is.singleNumber(para) || length(para)!=1 || para>1 || para<0)
       stop("'pValueCutoff' should be an integer or numeric value >=0 and <=1  !",call.=FALSE)
   }
-  ##---
   else if(name=="pAdjustMethod"){
     tp <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
-    if(!is.character(para) || length(para)!=1 || !(para %in% tp))
+    if(!is.singleString(para) || !(para %in% tp))
       stop("NOTE: 'pAdjustMethod' should be any one of: ",
            paste(tp, collapse = ", "),call.=FALSE)
   }
-  ##---
   else if(name == "priorEvidenceTable"){
     #--- general checks
     if(!is.data.frame(para) || !ncol(para)==3 || !nrow(para)>=1 || 
@@ -151,13 +224,11 @@ mbr.checks <- function(name, para, paraSuppl){
     }
     return(para)
   }
-  ##---
   else if(name == "tni"){
     if((class(para) != 'TNI') || is.null(para)){
       stop("NOTE: 'TNI' objects should be of TNI-class!", call.=FALSE)
     }
   }
-  ##---
   else if(name=="mbrGet"){
     opts <- c("summary", "status", "results", 
               "dualRegulons", "dualsCorrelation", "dualsOverlap",
@@ -166,7 +237,6 @@ mbr.checks <- function(name, para, paraSuppl){
       stop(paste("NOTE: 'what' should be any one of the options:", 
                  paste(opts,collapse = ", ") ), call.=FALSE)
   }
-  
 }
 
 ##------------------------------------------------------------------------------

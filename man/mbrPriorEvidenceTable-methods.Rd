@@ -11,7 +11,7 @@
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by the 
-method \code{\link[RTNduals:mbrAssociation]{mbrAssociation}}.}
+method \code{\link{mbrAssociation}}.}
 
 \item{priorEvidenceTable}{An 'data.frame' with three columns 
 representing (1) regulatory elements 1, (2) regulatory elements 2,

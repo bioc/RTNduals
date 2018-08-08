@@ -7,15 +7,14 @@
 \title{Motifs analysis and inference of 'dual regulons'.}
 \usage{
 \S4method{mbrAssociation}{MBR}(object, regulatoryElements = NULL,
-  minRegulonSize = 15, pValueCutoff = 0.001, pAdjustMethod = "BH",
-  estimator = "spearman", nPermutations = 1000, miFilter = TRUE,
-  verbose = TRUE)
+  minRegulonSize = 15, doSizeFilter = FALSE, pValueCutoff = 0.001,
+  pAdjustMethod = "bonferroni", estimator = "spearman",
+  nPermutations = 1000, miFilter = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by the 
-methods \code{\link[RTNduals:mbrPermutation]{mbrPermutation}}, 
-\code{\link[RTNduals:mbrBootstrap]{mbrBootstrap}} 
-and \code{\link[RTNduals:mbrDpiFilter]{mbrDpiFilter}}.}
+methods \code{\link{mbrPermutation}}, 
+\code{\link{mbrBootstrap}} and \code{\link{mbrDpiFilter}}.}
 
 \item{regulatoryElements}{An optional character vector specifying which 
 'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 
@@ -24,6 +23,9 @@ elements will be evaluated.}
 \item{minRegulonSize}{A single integer or numeric value specifying the 
 minimum number of elements in a regulon. Gene sets with fewer than this 
 number are removed from the analysis.}
+
+\item{doSizeFilter}{a logical value. If TRUE, negative and positive targets are 
+independently verified by the 'minRegulonSize' argument.}
 
 \item{pValueCutoff}{a single numeric value specifying the cutoff for p-values 
 considered significant.}
