@@ -4,11 +4,12 @@
 \alias{mbrPlotInteraction}
 \title{Plot interaction effects between two continuous variables.}
 \usage{
-mbrPlotInteraction(model, vars, xlim = NULL, ylim = NULL, zlim = NULL,
-  xlab = NULL, ylab = NULL, zlab = NULL, zcenter = NULL, zlog = NULL,
-  zcols = c("#008080ff", "#d45500ff"), ycols = c("#4A97C9", "#D92522"),
-  showdata = FALSE, datacols = "grey50", fname = "interplot",
-  fpath = ".", width = 4.5, height = 4, plotype = c("3D", "2D"),
+mbrPlotInteraction(model, vars, xlim = NULL, ylim = NULL,
+  zlim = NULL, xlab = NULL, ylab = NULL, zlab = NULL,
+  zcenter = NULL, zlog = NULL, zcols = c("#008080ff", "#d45500ff"),
+  ycols = c("#4A97C9", "#D92522"), showdata = FALSE,
+  datacols = "grey50", fname = "interplot", fpath = ".",
+  width = 4.5, height = 4, plotype = c("3D", "2D"),
   plotpdf = FALSE)
 }
 \arguments{
