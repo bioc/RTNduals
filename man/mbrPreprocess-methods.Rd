@@ -6,8 +6,8 @@
 \alias{mbrPreprocess}
 \title{A preprocessing function for objects of class MBR.}
 \usage{
-\S4method{mbrPreprocess}{matrix}(gexp, regulatoryElements, verbose = TRUE,
-  ...)
+\S4method{mbrPreprocess}{matrix}(gexp, regulatoryElements,
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{gexp}{A numerical matrix, typically with mRNA and/or miRNA expression 
