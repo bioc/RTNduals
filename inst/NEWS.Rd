@@ -4,13 +4,13 @@
 
 \section{Version 1.4.0}{
   \itemize{
-    \item Improved workflow integration with derivative packages (RTN / RTNsurvival).
+    \item Improved workflow, integration with derivative packages (RTN / RTNsurvival).
   }
 }
 
 \section{Version 1.2.0}{
   \itemize{
-    \item Improved workflow integration with derivative packages (RTN / RTNsurvival).
+    \item Improved workflow, integration with derivative packages (RTN / RTNsurvival).
   }
 }
 
