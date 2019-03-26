@@ -12,9 +12,7 @@
   nPermutations = 1000, miFilter = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{object}{A processed object of class \linkS4class{MBR} evaluated by the 
-methods \code{\link{mbrPermutation}}, 
-\code{\link{mbrBootstrap}} and \code{\link{mbrDpiFilter}}.}
+\item{object}{A processed object of class \linkS4class{MBR}}
 
 \item{regulatoryElements}{An optional character vector specifying which 
 'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 
@@ -61,20 +59,22 @@ gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
 tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
-##--- run mbrPreprocess
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-rowAnnotation=annot)
+##--- construct a tni object
+rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
 
-##--- run mbrPermutation (set nPermutations>=1000)
-rmbr <- mbrPermutation(rmbr, nPermutations=30)
+##--- compute regulons 
+## set nPermutations>=1000
+rtni <- tni.permutation(rtni, nPermutations=30)
+## set nBootstrap>=100
+rtni <- tni.bootstrap(rtni, nBootstrap=30)
+## 'eps=NA' estimates threshold from empirical null
+rtni <- tni.dpi.filter(rtni, eps=NA)
 
-##--- run mbrBootstrap (nBootstrap>=100)
-rmbr <- mbrBootstrap(rmbr, nBootstrap=30)
+##--- construct a mbr object
+rmbr <- tni2mbrPreprocess(rtni)
 
-##--- run mbrDpiFilter
-rmbr <- mbrDpiFilter(rmbr)
-
-##--- run mbrAssociation (set nPermutations>=1000)
+##--- run mbrAssociation 
+## set nPermutations>=1000
 rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=30)
 
 }

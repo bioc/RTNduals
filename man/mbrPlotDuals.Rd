@@ -26,29 +26,32 @@ A plot showing targets of dual regulons.
 This function plots the shared targets for a regulon pair.
 }
 \examples{
+
 ##--- load a dataset for demonstration
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
 tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
-##--- run mbrPreprocess
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-rowAnnotation=annot)
+##--- construct a tni object
+rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
+
+##--- compute regulons 
+## set nPermutations>=1000
+rtni <- tni.permutation(rtni, nPermutations=30)
+## set nBootstrap>=100
+rtni <- tni.bootstrap(rtni, nBootstrap=30)
+## 'eps=NA' estimates threshold from empirical null
+rtni <- tni.dpi.filter(rtni, eps=NA)
+
+##--- construct a mbr object
+rmbr <- tni2mbrPreprocess(rtni)
+
+##--- run mbrAssociation 
+## set nPermutations>=1000
+rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=30)
 
 \dontrun{
-
-##--- run mbrPermutation
-rmbr <- mbrPermutation(rmbr, nPermutations=1000)
-
-##--- run mbrBootstrap
-rmbr <- mbrBootstrap(rmbr, nBootstrap=100)
-
-##-- run mbrDpiFilter
-rmbr <- mbrDpiFilter(rmbr)
-
-##--- run mbrAssociation
-rmbr <- mbrAssociation(rmbr, nPermutations=1000)
 
 ##--- get inferred duals and plot the shared cloud of targets
 duals <- mbrGet(rmbr, what="dualRegulons")

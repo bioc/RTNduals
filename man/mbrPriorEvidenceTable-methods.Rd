@@ -37,20 +37,30 @@ gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
 tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
-##--- run mbrAssociation (set nPermutations>=1000 and nBootstrap>=100)
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-rowAnnotation=annot)
-rmbr <- mbrPermutation(rmbr, nPermutations=10)
-rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
-rmbr <- mbrDpiFilter(rmbr)
-rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=10)
+##--- construct a tni object
+rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
+
+##--- compute regulons 
+## set nPermutations>=1000
+rtni <- tni.permutation(rtni, nPermutations=30)
+## set nBootstrap>=100
+rtni <- tni.bootstrap(rtni, nBootstrap=30)
+## 'eps=NA' estimates threshold from empirical null
+rtni <- tni.dpi.filter(rtni, eps=NA)
+
+##--- construct a mbr object
+rmbr <- tni2mbrPreprocess(rtni)
+
+##--- run mbrAssociation 
+## set nPermutations>=1000
+rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=30)
 
 ##--- check results
 results <- mbrGet(rmbr, what="dualsCorrelation")
 
 ##--- add supplementary evidence table
-## here we build a 'toy' example using the 'rnorm' function for 
-## demonstration purposes only!
+## here we build a 'toy' example using the 'rnorm' function 
+## for demonstration purposes only!
 priorEvidenceTable <- results[,c("Regulon1","Regulon2")]
 priorEvidenceTable$ToyEvidence <- rnorm(nrow(results))
 priorEvidenceTable

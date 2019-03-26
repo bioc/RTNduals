@@ -17,15 +17,16 @@ mbr.checks <- function(name, para, paraSuppl){
     }
   }
   else if(name == "regulatoryElements"){
-    if( !is.character(para) || any(is.na(para)) || 
-        any(para == "") || is.null(para)  ){
-      tp <- paste("NOTE: 'regulatoryElements' should be a character vector,",
-                  "without 'NA' or empty names!")
-      stop(tp, call.=FALSE)
+    if(!is.null(para)){
+      if( !all.characterValues(para) || any(para == "") ){
+        tp <- paste("NOTE: 'regulatoryElements' should be a character vector,",
+                    "without 'NA' or empty names!")
+        stop(tp, call.=FALSE)
+      }
+      if( any(duplicated(para)) )
+        stop("NOTE: 'regulatoryElements' should have unique identifiers!", 
+             call.=FALSE)
     }
-    if( any(duplicated(para)) )
-      stop("NOTE: 'regulatoryElements' should have unique identifiers!", 
-           call.=FALSE)
   }
   else if(name=="object"){
     if(class(para) != 'MBR')
@@ -168,8 +169,8 @@ mbr.checks <- function(name, para, paraSuppl){
       stop("'zlab' must be a single character.", call. = FALSE)
   }
   else if(name=="numberRegElements"){
-    if(length(para)==0)
-      stop("NOTE: at least 1 regulatory element should be listed in 'regulatoryElements'!", 
+    if(length(para)<2)
+      stop("NOTE: at least 2 regulatory elements should be valid!", 
            call.=FALSE)
   }
   else if(name=="pValueCutoff") {
@@ -223,11 +224,6 @@ mbr.checks <- function(name, para, paraSuppl){
       stop(c(paste(tp, paste(duplnms,collapse=", ")), call.=FALSE))
     }
     return(para)
-  }
-  else if(name == "tni"){
-    if((class(para) != 'TNI') || is.null(para)){
-      stop("NOTE: 'TNI' objects should be of TNI-class!", call.=FALSE)
-    }
   }
   else if(name=="mbrGet"){
     opts <- c("summary", "status", "results", 

@@ -15,7 +15,7 @@ RTNduals is a tool that searches for possible co-regulatory loops between regulo
 \tabular{ll}{
 Package: \tab RTNduals\cr
 Type: \tab Package\cr
-Depends: \tab R (>= 3.5.0), methods, RTN (>= 2.4.2)\cr 
+Depends: \tab R (>= 3.5.0), methods, RTN\cr 
 Imports: \tab grDevices, stats, utils\cr
 Suggests: \tab knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics\cr 
 License: \tab Artistic-2.0\cr
@@ -27,15 +27,12 @@ biocViews: \tab NetworkInference, NetworkEnrichment, GeneRegulation, GeneExpress
 
 \tabular{ll}{
 \link{MBR-class}: \tab an S4 class for co-regulation analysis and inference of 'dual regulons'.\cr
-\link{mbrPreprocess}: \tab a preprocessing function for objects of class MBR.\cr
-\link{mbrPermutation}: \tab inference of transcriptional networks.\cr
-\link{mbrBootstrap}: \tab inference of consensus transcriptional networks.\cr
-\link{mbrDpiFilter}: \tab a filter based on the Data Processing Inequality (DPI) algorithm.\cr
 \link{mbrAssociation}: \tab motifs analysis and inference of "dual regulons".\cr
 \link{mbrPriorEvidenceTable}: \tab adds external evidences to "dual regulons".\cr
 \link{mbrPlotDuals}: \tab plot shared targets between regulons.\cr
 \link{mbrPlotInteraction}: \tab plots interaction effects between continuous variables.\cr
 \link{tni2mbrPreprocess}: \tab a preprocessing function for objects of class MBR.\cr
+\link{mbrGet}: \tab get information from individual slots in MBR object.\cr
 }
 
 Further information is available in the vignettes by typing 
