@@ -38,12 +38,7 @@ based on the available methods.}
 \section{Constructor}{
 
 
-There are two constructors to create an MBR object, users can opt for one of the following: 
-(1) \code{\link{mbrPreprocess}}; 
-(2) \code{\link{tni2mbrPreprocess}}.
-\itemize{
-\item {(1)}: {It is used to create an MBR object without any pre-computed transcriptional network.}
-\item {(2)}: {It is used to create an MBR object using available transcriptional networks.} 
-}
+There is one constructors to create an MBR object: 
+\code{\link{tni2mbrPreprocess}};
 }
 

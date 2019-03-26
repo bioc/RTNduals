@@ -36,18 +36,15 @@
   return(object)
 }
 
-##------------------------------------------------------------------------------
 #' A preprocessing function for objects of class MBR.
 #'
-#' @param gexp A numerical matrix, typically with mRNA and/or miRNA expression 
-#' values.
-#' @param regulatoryElements A named vector with regulatory elements listed in 
-#' 'gexp' rownames.
-#' @param verbose A single logical value specifying to display detailed 
-#' messages (when verbose=TRUE) or not (when verbose=FALSE).
-#' @param ... Additional arguments passed on to 
-#' \code{\link{tni.preprocess}} function.
-#' @return A preprocessed 'MBR-class' object.
+#' This function converts a TNI class objects and into one MBR class object.
+#'
+#' @param tni A 'TNI' class object.
+#' @param regulatoryElements An optional character vector specifying which 
+#' 'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 
+#' elements will be evaluated.
+#' @return An \linkS4class{MBR} object.
 #' @examples
 #' ##--- load a dataset for demonstration
 #' data("dt4rtn", package = "RTN")
@@ -55,283 +52,83 @@
 #' annot <- dt4rtn$gexpIDs
 #' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 #' 
-#' ##--- run mbrPreprocess
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs,
-#' rowAnnotation=annot)
+#' ##--- construct a tni object
+#' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
 #'
-#' @import RTN
+#' ##--- compute regulons 
+#' ## set nPermutations>=1000
+#' rtni <- tni.permutation(rtni, nPermutations=30)
+#' ## set nBootstrap>=100
+#' rtni <- tni.bootstrap(rtni, nBootstrap=30)
+#' ## 'eps=NA' estimates threshold from empirical null
+#' rtni <- tni.dpi.filter(rtni, eps=NA)
+#' 
+#' ##--- construct a mbr object
+#' rmbr <- tni2mbrPreprocess(rtni)
+#'
+#' @importClassesFrom RTN TNI
 #' @import methods
 #' @docType methods
-#' @rdname mbrPreprocess-methods
-#' @aliases mbrPreprocess
+#' @rdname tni2mbrPreprocess-methods
+#' @aliases tni2mbrPreprocess
 #' @export
 
-##Regulons pre-processing method
-setMethod("mbrPreprocess",
-          "matrix",
-          function(gexp, regulatoryElements, verbose=TRUE,...){
-            #---checks
-            if(missing(gexp))
-              stop("NOTE: 'gexp' is missing ", call.=FALSE)
-            if(missing(regulatoryElements)) 
-              stop("NOTE: 'regulatoryElements' is missing", call.=FALSE)
-            mbr.checks(name='gexp', gexp)
-            mbr.checks(name='regulatoryElements', regulatoryElements)
-            mbr.checks(name="verbose", para=verbose) 
+##------------------------------------------------------------------------------
+setMethod("tni2mbrPreprocess",
+          "TNI",
+          function (tni, regulatoryElements=NULL){
+            if(tni@status["Permutation"]!="[x]")
+              stop("NOTE: input 'tni' object needs permutation/bootstrep analysis!")  
+            mbr.checks(name="regulatoryElements", para=regulatoryElements)
             
-            ##--- build tni
-            tni <- tni.constructor(expData=gexp, regulatoryElements=regulatoryElements, ...=...)
-            regulatoryElements <- tni.get(tni, what="regulatoryElements")
-            if(length(regulatoryElements)<2){
-              tp <- paste("NOTE: at least two valid regulators in 'regulatoryElements'",
-                          "are required to call 'dual regulons'!")
-              stop(tp, call.=FALSE)
+            #---check compatibility
+            tni <- upgradeTNI(tni)
+            if(tni@status["Preprocess"]!="[x]")
+              stop("NOTE: TNI object is not compleate: requires preprocessing!")
+            if(tni@status["Permutation"]!="[x]")
+              stop("NOTE: TNI object is not compleate: requires permutation/bootstrap and DPI filter!")  
+            if(tni@status["DPI.filter"]!="[x]")
+              stop("NOTE: TNI object is not compleate: requires DPI filter!")
+            
+            #--- creates an MBR object
+            object <- .mbr.constructor(tni) 
+            
+            #--- match regulatoryElements
+            if(is.null(regulatoryElements)) {
+              regulatoryElements <- tni.get(tni, "regulatoryElements")
+            } else {
+              regulatoryElements <- .checkRegel(tni, regulatoryElements)
             }
+              
+            #--- get/set status
+            tni_status <- tni.get(tni, what="status")
+            status <- names(tni_status[tni_status=="[x]"])
+            object <- .mbr.set(name="statusUpdate", para=status, object=object)
             
-            ##--- build mbr
-            object <- .mbr.constructor(tni)
-            object <- .mbr.set(name="statusUpdate", 
-                               para="Preprocess", 
-                               object=object)
-            
-            return(object)
-          }
-)
-##------------------------------------------------------------------------------
-#' Inference of transcriptional networks.
-#'
-#' This function takes an MBR object and computes two transcriptional networks 
-#' inferred 
-#' by mutual information (with multiple hypothesis testing corrections).
-#' 
-#' @param object A preprocessed object of class \linkS4class{MBR}.
-#' @param verbose A single logical value specifying to display detailed 
-#' messages (when verbose=TRUE) or not (when verbose=FALSE).
-#' @param ... Additional arguments passed on to the 
-#' \code{\link{tni.permutation}} function.
-#' @return An \linkS4class{MBR} object with two mutual information matrices, 
-#' one in each "TNI" slot.
-#' @examples
-#' ##--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-#' 
-#' ##--- run mbrPreprocess
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-#' rowAnnotation=annot)
-#' 
-#' ##--- run mbrPermutation(set nPermutations>=1000)
-#' rmbr <- mbrPermutation(rmbr, nPermutations=10)
-#'
-#' @import RTN 
-#'
-#' @import methods
-#' @docType methods
-#' @rdname mbrPermutation-methods
-#' @aliases mbrPermutation
-#' @export
-
-## permutation
-setMethod("mbrPermutation",
-          "MBR",
-          function(object, verbose=TRUE, ...){
-            ##--- input check
-            if(object@status["Preprocess"]!="[x]")
-              stop("NOTE: MBR object is not compleate: requires preprocessing!")
-            ##---checks
-            mbr.checks(name="object", para=object)
-            mbr.checks(name="verbose", para=verbose)
-            ##---get tni
-            tni <- mbrGet(object, what="TNI")
-            
-            ##---permutation tni
-            tni <- tni.permutation(tni, verbose=verbose,...=...)
-            #---get
+            #--- get updates
             tni_summary <- tni.get(tni, what="summary")
             mbr_summary <- mbrGet(object, what="summary")
             mbr_para <- mbrGet(object, what="para")
             
-            #---changes
-            mbr_para$TNI$perm <- tni_summary$para$perm
-            mbr_para$TNI$boot <- tni_summary$para$boot
-            mbr_para$TNI$dpi <- tni_summary$para$dpi
+            ##--- mbr_summary
             mbr_summary$TNI$tnet <- tni_summary$results$tnet
             mbr_summary$TNI$regulonSize <- tni_summary$results$regulonSize
             colnames(mbr_summary$TNI$tnet) <- c('Regulators', 'Targets', 'Edges')
             
-            #---set
-            object <- .mbr.set(name="TNI", para=tni, object=object)
-            object <- .mbr.set(name="statusUpdate", para="Permutation", 
-                               object=object)
-            object <- .mbr.set(name="para", para=mbr_para, object=object)
-            object <- .mbr.set(name="summary", para=mbr_summary, object=object)
-            return(object)
-          }
-)
-
-#' Inference of consensus transcriptional networks.
-#'
-#' This function takes an MBR object and computes two consensus transcriptional 
-#' networks.
-#'
-#' @param object A processed objec of class \linkS4class{MBR} evaluated by the 
-#' method \code{\link{mbrPermutation}}.
-#' @param verbose A single logical value specifying to display detailed 
-#' messages (when verbose=TRUE) or not (when verbose=FALSE).
-#' @param ... Additional arguments passed to the 
-#' \code{\link{tni.bootstrap}} function.
-#' @return An \linkS4class{MBR} object with two consensus mutual information 
-#' matrices, one in each "TNI" slot.
-#' @examples
-#' ##--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-#' 
-#' ##--- run mbrPreprocess
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-#' rowAnnotation=annot)
-#' 
-#' ##--- run mbrPermutation (nPermutations>=1000)
-#' rmbr <- mbrPermutation(rmbr, nPermutations=10)
-#' 
-#' ##--- run mbrBootstrap (nPermutations>=100)
-#' rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
-#'
-#' @import RTN 
-#'
-#' @import methods
-#' @docType methods
-#' @rdname mbrBootstrap-methods
-#' @aliases mbrBootstrap
-#' @export
-
-##------------------------------------------------------------------------------
-## bootstrap method
-setMethod("mbrBootstrap",
-          "MBR",
-          function(object, verbose=TRUE, ...){
-            ##--- input check
-            if(object@status["Preprocess"]!="[x]")
-              stop("NOTE: MBR object is not compleate: requires preprocessing!")
-            if(object@status["Permutation"]!="[x]")
-              stop("NOTE: MBR object is not compleate: requires permutation analysis!") 
-            ##---checks
-            mbr.checks(name="object", para=object)
-            mbr.checks(name="verbose", para=verbose)
-            ##---get TNI
-            tni <- mbrGet(object, what="TNI")
-            
-            ##---bootstrap TNI
-            tni <- tni.bootstrap(tni, verbose=verbose,...=...)
-            
-            #---get
-            tni_summary <- tni.get(tni, what="summary")
-            mbr_summary <- mbrGet(object, what="summary")
-            mbr_para <- mbrGet(object, what="para")
-            
-            #---changes
-            mbr_para$TNI$perm <- tni_summary$para$perm
-            mbr_para$TNI$boot <- tni_summary$para$boot
-            mbr_para$TNI$dpi <- tni_summary$para$dpi
-            mbr_summary$TNI$tnet <- tni_summary$results$tnet
-            mbr_summary$TNI$regulonSize <- tni_summary$results$regulonSize
-            colnames(mbr_summary$TNI$tnet) <- c('Regulators', 'Targets', 'Edges')
+            ##--- mbr_para
+            mbr_para$perm <- tni_summary$para$perm
+            ##--- bootstrap
+            mbr_para$boot <- tni_summary$para$boot
+            ##---summary dpi.filter
+            mbr_para$dpi <- tni_summary$para$dpi
             
             #---set
-            object <- .mbr.set(name="TNI", para=tni, object=object)
-            object <- .mbr.set(name="statusUpdate", para="Bootstrap", 
-                               object=object)
+            object <- .mbr.set(name="regulatoryElements", 
+                               para=regulatoryElements, object=object)
             object <- .mbr.set(name="para", para=mbr_para, object=object)
             object <- .mbr.set(name="summary", para=mbr_summary, object=object)
-            return(object)
-          }
-)
-
-#' A filter based on the Data Processing Inequality (DPI) algorithm.
-#'
-#' This function takes an MBR object and computes two transcriptional networks 
-#' filtered by the data processing inequality algorithm.
-#'
-#' @param object A processed object of class \linkS4class{MBR} evaluated by 
-#' the methods
-#'  \code{\link{mbrPermutation}} and 
-#'  \code{\link{mbrBootstrap}}.
-#' @param verbose A single logical value specifying to display detailed 
-#' messages (when verbose=TRUE) or not (when verbose=FALSE).
-#' @param ... Additional arguments passed to the 
-#' \code{\link{tni.dpi.filter}} function.
-#' @return An \linkS4class{MBR} object with two DPI-filtered mutual information 
-#' matrices, one in each "TNI" slot.
-#' @examples
-#' ##--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-#' 
-#' ##--- run mbrPreprocess
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-#' rowAnnotation=annot)
-#' 
-#' ##--- run mbrPermutation (set nPermutations>=1000)
-#' rmbr <- mbrPermutation(rmbr, nPermutations=10)
-#' 
-#' ##--- run mbrBootstrap (set nBootstrap>=100)
-#' rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
-#' 
-#' ##--- run mbrDpiFilter
-#' rmbr <- mbrDpiFilter(rmbr)
-#'
-#' @import RTN 
-#'
-#' @import methods
-#' @docType methods
-#' @rdname mbrDpiFilter-methods
-#' @aliases mbrDpiFilter
-#' @export
-
-##------------------------------------------------------------------------------
-## dpi filter method
-setMethod("mbrDpiFilter",
-          "MBR",
-          function(object, verbose=TRUE, ...){
-            ##--- input check
-            if(object@status["Preprocess"]!="[x]")
-              stop("NOTE: MBR object is not compleate: requires preprocessing!")
-            if(object@status["Permutation"]!="[x]")
-              stop("NOTE: MBR object is not compleate: requires permutation/bootstrap analysis!")
-            ##---checks
-            mbr.checks(name="object", para=object)
-            mbr.checks(name="verbose", para=verbose)
-            ##---get TNI
-            tni <- mbrGet(object, what="TNI")
+            return (object)
             
-            ##---Dpi filter
-            tni <-tni.dpi.filter(tni, verbose=verbose, ...=...)
-            #---get
-            tni_summary <- tni.get(tni, what="summary")
-            mbr_summary <- mbrGet(object, what="summary")
-            mbr_para <- mbrGet(object, what="para")
-            
-            #---changes
-            mbr_para$TNI$perm <- tni_summary$para$perm
-            mbr_para$TNI$boot <- tni_summary$para$boot
-            mbr_para$TNI$dpi <- tni_summary$para$dpi
-            mbr_summary$TNI$tnet <- tni_summary$results$tnet
-            mbr_summary$TNI$regulonSize <- tni_summary$results$regulonSize
-            colnames(mbr_summary$TNI$tnet) <- c('Regulators', 'Targets', 'Edges')
-
-            #---set
-            object <- .mbr.set(name="TNI", para=tni, object=object)
-            object <- .mbr.set(name="statusUpdate", para="DPI.filter", 
-                               object=object)
-            object <- .mbr.set(name="para", para=mbr_para, object=object)
-            object <- .mbr.set(name="summary", para=mbr_summary, object=object)
-            return(object)
           }
 )
 
@@ -341,9 +138,7 @@ setMethod("mbrDpiFilter",
 #' targets in order to test whether regulon pairs agree on the predicted 
 #' downstream effects.
 #'
-#' @param object A processed object of class \linkS4class{MBR} evaluated by the 
-#' methods \code{\link{mbrPermutation}}, 
-#' \code{\link{mbrBootstrap}} and \code{\link{mbrDpiFilter}}.
+#' @param object A processed object of class \linkS4class{MBR}
 #' @param regulatoryElements An optional character vector specifying which 
 #' 'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 
 #' elements will be evaluated.
@@ -373,26 +168,27 @@ setMethod("mbrDpiFilter",
 #' annot <- dt4rtn$gexpIDs
 #' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 #' 
-#' ##--- run mbrPreprocess
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-#' rowAnnotation=annot)
+#' ##--- construct a tni object
+#' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
+#'
+#' ##--- compute regulons 
+#' ## set nPermutations>=1000
+#' rtni <- tni.permutation(rtni, nPermutations=30)
+#' ## set nBootstrap>=100
+#' rtni <- tni.bootstrap(rtni, nBootstrap=30)
+#' ## 'eps=NA' estimates threshold from empirical null
+#' rtni <- tni.dpi.filter(rtni, eps=NA)
 #' 
-#' ##--- run mbrPermutation (set nPermutations>=1000)
-#' rmbr <- mbrPermutation(rmbr, nPermutations=30)
+#' ##--- construct a mbr object
+#' rmbr <- tni2mbrPreprocess(rtni)
 #' 
-#' ##--- run mbrBootstrap (nBootstrap>=100)
-#' rmbr <- mbrBootstrap(rmbr, nBootstrap=30)
-#' 
-#' ##--- run mbrDpiFilter
-#' rmbr <- mbrDpiFilter(rmbr)
-#' 
-#' ##--- run mbrAssociation (set nPermutations>=1000)
+#' ##--- run mbrAssociation 
+#' ## set nPermutations>=1000
 #' rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=30)
 #'
 #' @import RTN 
 #' @importFrom stats p.adjust phyper median pnorm sd
 #' @importFrom stats cor quantile pt complete.cases
-#'
 #' @import methods
 #' @docType methods
 #' @rdname mbrAssociation-methods
@@ -419,6 +215,7 @@ setMethod("mbrAssociation",
             tni_gexp <- tni.get(tni, what="gexp")
             tni_para <- tni.get(tni, what="para")
             ##--- checks
+            mbr.checks(name="regulatoryElements", para=regulatoryElements)
             mbr.checks(name="minRegulonSize", para=minRegulonSize)
             mbr.checks(name="doSizeFilter",para=doSizeFilter)
             mbr.checks(name="estimator", para=estimator)
@@ -431,22 +228,21 @@ setMethod("mbrAssociation",
             if(verbose) cat("-Checking regulons and regulatory elements...\n")
             
             if(is.null(regulatoryElements)) {
-              regulatoryElements <- tni.get(tni, "regulatoryElements")
+              regulatoryElements <- mbrGet(object, "regulatoryElements")
             } else {
-              mbr.checks(name="regulatoryElements", para=regulatoryElements)
-              regulatoryElements <- .checkRegel(tni, regulatoryElements)
+              temp <- mbrGet(object, "regulatoryElements")
+              regulatoryElements <- temp[temp%in%regulatoryElements|
+                                           temp%in%names(regulatoryElements)]
             }
             mbr.checks(name="numberRegElements", para=regulatoryElements)
             
             ##--- get all regulons (from tni)
             regulonsAndMode <- tni.get(tni, what="regulons.and.mode")
             regulons <- tni.get(tni, what="regulons")
-            refregulons <- tni.get(tni, what="refregulons")
             
             ##--- get regulons for 'regulatoryElements'
             regulonsAndMode <- regulonsAndMode[regulatoryElements]
             regulons <- regulons[regulatoryElements]
-            refregulons <- refregulons[regulatoryElements]
             
             ##-----check regulon size (both clouds)
             gs.size.max <- unlist(lapply(regulonsAndMode, function(reg){
@@ -474,7 +270,6 @@ setMethod("mbrAssociation",
             ##---
             regulonsAndMode <- regulonsAndMode[regulatoryElements]
             regulons <- regulons[regulatoryElements]
-            refregulons <- refregulons[regulatoryElements]
             
             ##--- group of regulons and regulatory elements
             targets <- unique(c(unlist(regulons)))
@@ -486,6 +281,7 @@ setMethod("mbrAssociation",
             }
             mitnet <- abs(tni.get(tni, what="refnet"))
             mitnet <- mitnet[targets,regulatoryElements, drop=FALSE]
+            ntargets <- tni.get(tni,"summary")$results$tnet["tnet.ref","Targets"]
             
             if(verbose) {
               cat("-Mapping network triplets between regulons...\n")
@@ -496,7 +292,7 @@ setMethod("mbrAssociation",
                                 asInteger=FALSE, mapAssignedAssociation=FALSE)
             
             ##--- map interactions for all potential dual regulons
-            interegulons <- .getInterRegulons(refregulons, regulons)
+            uniregulons <- .getUnionRegulons(regulons)
             
             ##--- compute correlation between regulons
             ## the transformation with double 'cor' calls combines the two distributions
@@ -504,7 +300,7 @@ setMethod("mbrAssociation",
             ## directionality of the approach.
             regcor <- sapply(regulatoryElements, function(r1){
               sapply(regulatoryElements, function(r2){
-                tar12 <- interegulons[[r1]][[r2]]
+                tar12 <- uniregulons[[r1]][[r2]]
                 r1 <- cortnet[tar12,r1]
                 r2 <- cortnet[tar12,r2]
                 c1 <- cor(r1, r2, method=estimator)
@@ -536,16 +332,17 @@ setMethod("mbrAssociation",
               ##--- n. tests before any filter
               n.tests <- sum(!is.na(regcor))
               
-              ##--- assessing overlap between regulons using 'interegulons'
+              ##--- assessing overlap between regulons
               if(verbose) {
                 tp <- paste("-Assessing overlap between",
                             length(regulons),"regulons...\n")
                 cat(tp)
               }
-              overlapStats <- .mbr.overlap(statlist, regulons, refregulons, verbose)
+              overlapStats <- .mbr.overlap(statlist, regulons, ntargets, verbose)
               ##--- adjust Pvalue for n.tests
               overlapStats$Adjusted.Pvalue <- p.adjust(overlapStats$Pvalue, 
-                                                       method=pAdjustMethod, n=n.tests )
+                                                       method=pAdjustMethod, 
+                                                       n=n.tests)
               overlapStats <- overlapStats[overlapStats$Adjusted.Pvalue<pValueCutoff,]
               statlist <- statlist[rownames(overlapStats),]
               
@@ -559,10 +356,12 @@ setMethod("mbrAssociation",
               if(nrow(statlist) > 0){
                 
                 ##--- Permutation on correlation
-                corrStats <- .permCorPval(cortnet, statlist, interegulons, 
-                                          estimator, nper=nPermutations, verbose=verbose)
+                corrStats <- .permCorPval(cortnet, statlist, uniregulons, 
+                                          estimator, nper=nPermutations, 
+                                          verbose=verbose)
                 ##--- adjust Pvalue for n.tests
-                corrStats$Adjusted.Pvalue <- p.adjust(corrStats$Pvalue, method=pAdjustMethod, n=n.tests )
+                corrStats$Adjusted.Pvalue <- p.adjust(corrStats$Pvalue, 
+                                                      method=pAdjustMethod, n=n.tests)
                 corrStats <- corrStats[corrStats$Adjusted.Pvalue<pValueCutoff,]
                 statlist <- statlist[rownames(corrStats),]
                 
@@ -658,20 +457,30 @@ setMethod("mbrAssociation",
 #' annot <- dt4rtn$gexpIDs
 #' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 #' 
-#' ##--- run mbrAssociation (set nPermutations>=1000 and nBootstrap>=100)
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-#' rowAnnotation=annot)
-#' rmbr <- mbrPermutation(rmbr, nPermutations=10)
-#' rmbr <- mbrBootstrap(rmbr, nBootstrap=10)
-#' rmbr <- mbrDpiFilter(rmbr)
-#' rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=10)
+#' ##--- construct a tni object
+#' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
+#'
+#' ##--- compute regulons 
+#' ## set nPermutations>=1000
+#' rtni <- tni.permutation(rtni, nPermutations=30)
+#' ## set nBootstrap>=100
+#' rtni <- tni.bootstrap(rtni, nBootstrap=30)
+#' ## 'eps=NA' estimates threshold from empirical null
+#' rtni <- tni.dpi.filter(rtni, eps=NA)
 #' 
+#' ##--- construct a mbr object
+#' rmbr <- tni2mbrPreprocess(rtni)
+#' 
+#' ##--- run mbrAssociation 
+#' ## set nPermutations>=1000
+#' rmbr <- mbrAssociation(rmbr, pValueCutoff = 0.05, nPermutations=30)
+#'
 #' ##--- check results
 #' results <- mbrGet(rmbr, what="dualsCorrelation")
 #' 
 #' ##--- add supplementary evidence table
-#' ## here we build a 'toy' example using the 'rnorm' function for 
-#' ## demonstration purposes only!
+#' ## here we build a 'toy' example using the 'rnorm' function 
+#' ## for demonstration purposes only!
 #' priorEvidenceTable <- results[,c("Regulon1","Regulon2")]
 #' priorEvidenceTable$ToyEvidence <- rnorm(nrow(results))
 #' priorEvidenceTable
@@ -726,92 +535,6 @@ setMethod( "mbrPriorEvidenceTable",
            }
 )
 
-#' A preprocessing function for objects of class MBR.
-#'
-#' This function converts a TNI class objects and into one MBR class object.
-#'
-#' @param tni A 'TNI' class object.
-#' @param regulatoryElements A character vector specifying which 
-#' 'TNI' regulatory elements should be evaluated.
-#' @param verbose A single logical value specifying to display detailed messages 
-#' (when verbose=TRUE) or not (when verbose=FALSE).
-#' @return An \linkS4class{MBR} object.
-#' @examples
-#' #--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
-#' 
-#' \dontrun{
-#' 
-#' ##--- compute a TNI for tfs
-#' tni <- tni.constructor(expData=gexp, regulatoryElements=tfs, rowAnnotation=annot)
-#' 
-#' ##--- run tni2mbrPreprocess
-#' rmbr <- tni2mbrPreprocess(tni)
-#' }
-#'
-#' @import RTN
-#' @import methods
-#' @docType methods
-#' @rdname tni2mbrPreprocess-methods
-#' @aliases tni2mbrPreprocess
-#' @export
-
-##------------------------------------------------------------------------------
-setMethod("tni2mbrPreprocess",
-          "TNI",
-          function (tni, regulatoryElements=NULL, verbose=TRUE){
-            
-            if(missing(tni)) stop("NOTE: 'tni' is missing ", call.=FALSE)
-            tni <- upgradeTNI(tni)
-            mbr.checks(name='tni', para=tni)
-            if(!is.null(regulatoryElements)){
-              mbr.checks(name="regulatoryElements", para=regulatoryElements)
-              regulatoryElements <- .checkRegel(tni, regulatoryElements)
-              tni@regulatoryElements <- regulatoryElements
-            } else {
-              if(length(tni@regulatoryElements)<2){
-                tp <- paste("NOTE: at least two regulons the 'tni' object",
-                            "are required to call 'dual regulons'!")
-                stop(tp, call.=FALSE)
-              }
-            }
-            
-            ##---- creates MBR object
-            object <- .mbr.constructor(tni) 
-            
-            #--- get/set status
-            tni_status <- tni.get(tni, what="status")
-            status <- names(tni_status[tni_status=="[x]"])
-            object <- .mbr.set(name="statusUpdate", para=status, object=object)
-            
-            #--- get updates
-            tni_summary <- tni.get(tni, what="summary")
-            mbr_summary <- mbrGet(object, what="summary")
-            mbr_para <- mbrGet(object, what="para")
-            
-            ##--- mbr_summary
-            mbr_summary$TNI$tnet <- tni_summary$results$tnet
-            mbr_summary$TNI$regulonSize <- tni_summary$results$regulonSize
-            colnames(mbr_summary$TNI$tnet) <- c('Regulators', 'Targets', 'Edges')
-            
-            ##--- mbr_para
-            mbr_para$perm <- tni_summary$para$perm
-            ##--- bootstrap
-            mbr_para$boot <- tni_summary$para$boot
-            ##---summary dpi.filter
-            mbr_para$dpi <- tni_summary$para$dpi
-            
-            #---set
-            object <- .mbr.set(name="para", para=mbr_para, object=object)
-            object <- .mbr.set(name="summary", para=mbr_summary, object=object)
-            return (object)
-            
-          }
-)
-
 ##------------------------------------------------------------------------------
 ##show summary information on screen
 setMethod( "show",
@@ -841,10 +564,20 @@ setMethod( "show",
 #' annot <- dt4rtn$gexpIDs
 #' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 #' 
-#' ##--- run mbrPreprocess
-#' rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-#' rowAnnotation=annot)
+#' ##--- construct a tni object
+#' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
+#'
+#' ##--- compute regulons 
+#' ## set nPermutations>=1000
+#' rtni <- tni.permutation(rtni, nPermutations=30)
+#' ## set nBootstrap>=100
+#' rtni <- tni.bootstrap(rtni, nBootstrap=30)
+#' ## 'eps=NA' estimates threshold from empirical null
+#' rtni <- tni.dpi.filter(rtni, eps=NA)
 #' 
+#' ##--- construct a mbr object
+#' rmbr <- tni2mbrPreprocess(rtni)
+#'
 #' ##--- get the 'TNI' slot using 'mbrGet'
 #' tni <- mbrGet(rmbr, what="TNI")
 #' 
@@ -873,14 +606,14 @@ setMethod( "mbrGet",
                query <- object@summary
              } else if(what=="status"){
                query <- object@status
+             } else if(what=="regulatoryElements"){
+               query <- object@regulatoryElements               
              } else if(what%in%optsAssoci){
                if(object@status["Association"] != "[x]"){
                  warning("Input 'object' needs 'mbrAssociation' evaluation!", call.=FALSE)
                  query <- NULL
                } else {
-                 if(what=="regulatoryElements"){
-                   query <- object@regulatoryElements
-                 } else if(what=="dualRegulons"){
+                 if(what=="dualRegulons"){
                    query <- object@dualRegulons
                  } else if(what=="results"){
                    query <- object@results

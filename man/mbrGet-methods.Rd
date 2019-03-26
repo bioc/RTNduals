@@ -30,9 +30,19 @@ gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
 tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
-##--- run mbrPreprocess
-rmbr <- mbrPreprocess(gexp=gexp, regulatoryElements = tfs, 
-rowAnnotation=annot)
+##--- construct a tni object
+rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
+
+##--- compute regulons 
+## set nPermutations>=1000
+rtni <- tni.permutation(rtni, nPermutations=30)
+## set nBootstrap>=100
+rtni <- tni.bootstrap(rtni, nBootstrap=30)
+## 'eps=NA' estimates threshold from empirical null
+rtni <- tni.dpi.filter(rtni, eps=NA)
+
+##--- construct a mbr object
+rmbr <- tni2mbrPreprocess(rtni)
 
 ##--- get the 'TNI' slot using 'mbrGet'
 tni <- mbrGet(rmbr, what="TNI")

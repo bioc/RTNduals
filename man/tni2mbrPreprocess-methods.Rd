@@ -6,17 +6,14 @@
 \alias{tni2mbrPreprocess}
 \title{A preprocessing function for objects of class MBR.}
 \usage{
-\S4method{tni2mbrPreprocess}{TNI}(tni, regulatoryElements = NULL,
-  verbose = TRUE)
+\S4method{tni2mbrPreprocess}{TNI}(tni, regulatoryElements = NULL)
 }
 \arguments{
 \item{tni}{A 'TNI' class object.}
 
-\item{regulatoryElements}{A character vector specifying which 
-'TNI' regulatory elements should be evaluated.}
-
-\item{verbose}{A single logical value specifying to display detailed messages 
-(when verbose=TRUE) or not (when verbose=FALSE).}
+\item{regulatoryElements}{An optional character vector specifying which 
+'TNI' regulatory elements should be evaluated. If 'NULL' all regulatory 
+elements will be evaluated.}
 }
 \value{
 An \linkS4class{MBR} object.
@@ -25,19 +22,24 @@ An \linkS4class{MBR} object.
 This function converts a TNI class objects and into one MBR class object.
 }
 \examples{
-#--- load a dataset for demonstration
+##--- load a dataset for demonstration
 data("dt4rtn", package = "RTN")
 gexp <- dt4rtn$gexp
 annot <- dt4rtn$gexpIDs
 tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
 
-\dontrun{
+##--- construct a tni object
+rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
 
-##--- compute a TNI for tfs
-tni <- tni.constructor(expData=gexp, regulatoryElements=tfs, rowAnnotation=annot)
+##--- compute regulons 
+## set nPermutations>=1000
+rtni <- tni.permutation(rtni, nPermutations=30)
+## set nBootstrap>=100
+rtni <- tni.bootstrap(rtni, nBootstrap=30)
+## 'eps=NA' estimates threshold from empirical null
+rtni <- tni.dpi.filter(rtni, eps=NA)
 
-##--- run tni2mbrPreprocess
-rmbr <- tni2mbrPreprocess(tni)
-}
+##--- construct a mbr object
+rmbr <- tni2mbrPreprocess(rtni)
 
 }

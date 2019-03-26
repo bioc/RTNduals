@@ -87,7 +87,7 @@
 
 ##------------------------------------------------------------------------------
 ##compure correlation p-value from permutation analysis
-.permCorPval <- function(cortnet, statlist, interegulons,
+.permCorPval <- function(cortnet, statlist, uniregulons,
                          estimator, nper=1000, verbose=TRUE){
   r1names <- statlist$ID_regulon1
   r2names <- statlist$ID_regulon2
@@ -96,7 +96,7 @@
   ssize <- sapply(1:nrow(statlist), function(i){
     r1 <- r1names[i]
     r2 <- r2names[i]
-    length(interegulons[[r1]][[r2]])
+    length(uniregulons[[r1]][[r2]])
   })
   #--- run permutation
   ntests <- nrow(statlist)
@@ -129,15 +129,10 @@
 
 ##------------------------------------------------------------------------------
 ##This function takes two related gene sets (i.e. dual regulons) and compute the 
-## number of genes expected to occur in both regulons, the actual observed overlap,
-## and the pvalues. The test assesses the whether the intersect between refregulons
-## is enriched with the high stringent dpi targets.
-.mbr.overlap <- function(statlist, regulons, refregulons, verbose=TRUE){
+## number of genes expected to occur in both regulons, the observed overlap,
+## and the pvalues.
+.mbr.overlap <- function(statlist, regulons, ntargets, verbose=TRUE){
   regpairs <- statlist[, c("ID_regulon1", "ID_regulon2")]
-  ##get gene sets: used to test whether the intersect between refregulons
-  ##is enriched with the high stringent dpi targets
-  interegulons <- .getInterRegulons(refregulons, regulons)
-  unirefegulons <- .getUnionRefRegulons(refregulons)
   if(verbose) pb<-txtProgressBar(style=3)
   res <- NULL
   for(i in 1:nrow(regpairs)) {
@@ -146,17 +141,10 @@
     ##---
     reg1 <- vecpairs[1]
     reg2 <- vecpairs[2]
-    sz_set1 <- length( regulons[[reg1]])
-    sz_set2 <- length( regulons[[reg2]])
-    ##---
-    if(sz_set1 <= sz_set2){
-      sz_overlap <- length( intersect(regulons[[reg1]], interegulons[[reg1]][[reg2]]) )
-    } else {
-      sz_overlap <- length( intersect(regulons[[reg2]], interegulons[[reg1]][[reg2]]) )
-    }
-    #note: regulons are already conditioned to pairs of regulators,
-    #so the universe is the ref. regulons
-    sz_universe <- length( unirefegulons[[reg1]][[reg2]] )
+    sz_set1 <- length(regulons[[reg1]])
+    sz_set2 <- length(regulons[[reg2]])
+    sz_overlap <- length(intersect(regulons[[reg1]], regulons[[reg2]]))
+    sz_universe <- ntargets
     ##---
     tmp <- .regulon.hyper(sz_set1, sz_set2, sz_overlap, sz_universe)
     res <- rbind(res, tmp)
@@ -184,38 +172,22 @@
 }
 
 ##------------------------------------------------------------------------------
-## Map interactions for all potential dual regulons
-## (1) get a broad intersect between regulons (i.e. refregulons)
-## (2) then put the focus on targets of higher stringency
-.getInterRegulons <- function(refregulons, regulons){
-  interegulons <- lapply(names(regulons), function(r1){
+.getUnionRegulons <- function(regulons){
+  res <- lapply(names(regulons), function(r1){
     inter <- lapply(names(regulons), function(r2){
-      reftar12 <- intersect(refregulons[[r1]],refregulons[[r2]])
-      tar12 <- union(regulons[[r1]],regulons[[r2]])
-      intersect(tar12,reftar12)
+      union(regulons[[r1]],regulons[[r2]])
     })
     names(inter) <- names(regulons)
     inter
   })
-  names(interegulons) <- names(regulons)
-  return(interegulons)
-}
-.getUnionRefRegulons <- function(refregulons){
-  interefegulons <- lapply(names(refregulons), function(r1){
-    inter <- lapply(names(refregulons), function(r2){
-      union(refregulons[[r1]],refregulons[[r2]])
-    })
-    names(inter) <- names(refregulons)
-    inter
-  })
-  names(interefegulons) <- names(refregulons)
-  return(interefegulons)
+  names(res) <- names(regulons)
+  return(res)
 }
 
 ##------------------------------------------------------------------------------
 ##check the consistency of priorEvidenceTable
-.checkConsistencySuppTable <- function(object, priorEvidenceTable, verbose)
-  {
+.checkConsistencySuppTable <- function(object, priorEvidenceTable, 
+                                       verbose){
   ##---
   evidenceColname <- colnames(priorEvidenceTable)[3]
   dualsCorrelation <- mbrGet(object, what="dualsCorrelation")
@@ -244,7 +216,8 @@
 
 ##------------------------------------------------------------------------------
 ##update 'priorEvidenceTable'
-.updateEvidenceTable <- function (object, priorEvidenceTable, verbose=TRUE){
+.updateEvidenceTable <- function (object, priorEvidenceTable, 
+                                  verbose=TRUE){
   evidenceColname <- colnames(priorEvidenceTable)[3]
   dualsCorrelation <- mbrGet(object, what="dualsCorrelation")
   dualsCorrelation[, evidenceColname] <- NA
