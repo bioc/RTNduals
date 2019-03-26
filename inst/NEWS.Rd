@@ -1,5 +1,5 @@
-\name{RTN-News}
-\title{RTN News}
+\name{RTNduals-News}
+\title{RTNduals News}
 \encoding{UTF-8}
 
 \section{Version 1.6.0}{
