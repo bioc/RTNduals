@@ -1,13 +1,23 @@
 
 citEntry(entry = "Article",
-  author = "Mauro Castro and Ines de Santiago and Thomas Campbell and Courtney Vaughn and Theresa Hickey and Edith Ross and Wayne Tilley and Florian Markowetz and Bruce Ponder and Kerstin Meyer",
-  title = "Regulators of genetic risk of breast cancer identified by integrative network analysis.",
-  journal = "Nature Genetics",
-  year = "2016",
-  volume = {48},
-  pages = {12--21},
-  doi = "10.1038/ng.3458",
-  textVersion = "Castro MAA, de Santiago I, Campbell TM, ..., Meyer KB. Regulators of genetic risk of breast cancer identified by integrative network analysis. Nature Genetics, 48:12-21, 2016."
+author = "Vinicius Chagas and Clarice Groeneveld and Kelin Oliveira and Sheyla Trefflich and Rodrigo de Almeida and Bruce Ponder and Kerstin Meyer and Steven Jones and Gordon Robertson and Mauro Castro",
+title = "RTNsurvival: an R/Bioconductor package for regulatory network survival analysis.",
+journal = "Bioinformatics",
+year = "2019",
+pages = {"btz534"},
+doi = "10.1093/bioinformatics/btz534",
+textVersion = "Chagas VS, Groeneveld CS, Oliveira K, Trefflich S, de Almeida R, Ponder BAJ, Meyer KB, Jones SJM, Robertson AG, Castro MAA. RTNduals: an R/Bioconductor package for analysis of co-regulation and inference of dual regulons. Bioinformatics, btz229, 2019."
+)
+
+citEntry(entry = "Article",
+author = "Mauro Castro and Ines de Santiago and Thomas Campbell and Courtney Vaughn and Theresa Hickey and Edith Ross and Wayne Tilley and Florian Markowetz and Bruce Ponder and Kerstin Meyer",
+title = "Regulators of genetic risk of breast cancer identified by integrative network analysis.",
+journal = "Nature Genetics",
+year = "2016",
+volume = {48},
+pages = {12--21},
+doi = "10.1038/ng.3458",
+textVersion = "Castro MAA, de Santiago I, Campbell TM, ..., Meyer KB. Regulators of genetic risk of breast cancer identified by integrative network analysis. Nature Genetics, 48:12-21, 2016."
 )
 
 
