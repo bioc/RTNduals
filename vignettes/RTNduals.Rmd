@@ -25,23 +25,23 @@ Recurrent patterns in biological networks may reflect critical roles in multiple
 The **RTNduals** workflow starts with a preprocessing step that generates a **TNI-class** object from an expression matrix and a list of regulators. The expression matrix is typically obtained from multiple samples (e.g. transcriptomes from a cancer cohort), while the list of regulators represents some prior biological information indicating which genes in the expression matrix should be regarded as regulators. The input data can also deal with different classes of regulators; for example, genes and microRNAs. In this case, the expression matrix should comprise mRNA and miRNA expression values.
 
 ## Load datasets
-This example provides the data required to generate an **TNI-class** object. The dataset **dt4rtn** is available from the **RTN** package and consists of an R list with 6 objects, 3 of which will be used in the subsequent analysis: (1) **gexp**, a named gene expression matrix with 120 samples (genes in rows, samples in cols), (2) **gexpIDs**, a data.frame with Probe-to-ENTREZ annotation, and (3) **tfs**, a named vector listing 148 transcription factors. These datasets were extracted, pre-processed and size-reduced from @Fletcher2013, and should be regarded as examples for demonstration purposes only.
+This example provides the data required to generate an **TNI-class** object. The dataset **tniData** is available from the **RTN** package and consists of an R list with 6 objects, 3 of which will be used in the subsequent analysis: (1) **expData**, a named gene expression matrix with 120 samples (genes in rows, samples in cols), (2) **rowAnnotation**, a data.frame with Probe-to-ENTREZ annotation, and (3) **tfs**, a character vector listing transcription factors. These datasets were extracted, pre-processed and size-reduced from @Fletcher2013, and should be regarded as examples for demonstration purposes only.
 
 ```{r include=FALSE}
 library(RTNduals)
-data("dt4rtn", package = "RTN")
-gexp <- dt4rtn$gexp
-annot <- dt4rtn$gexpIDs
-tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")]
+data("tniData", package = "RTN")
+gexp <- tniData$expData
+annot <- tniData$rowAnnotation
+tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 ```
 
 ```{r eval=FALSE}
 ##--- load package and dataset for demonstration
 library(RTNduals)
-data("dt4rtn", package = "RTN")
-gexp <- dt4rtn$gexp
-annot <- dt4rtn$gexpIDs
-tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")]
+data("tniData", package = "RTN")
+gexp <- tniData$expData
+annot <- tniData$rowAnnotation
+tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 ```
 
 ## Preprocessing

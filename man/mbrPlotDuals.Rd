@@ -28,10 +28,10 @@ This function plots the shared targets for a regulon pair.
 \examples{
 
 ##--- load a dataset for demonstration
-data("dt4rtn", package = "RTN")
-gexp <- dt4rtn$gexp
-annot <- dt4rtn$gexpIDs
-tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
+data("tniData", package = "RTN")
+gexp <- tniData$expData
+annot <- tniData$rowAnnotation
+tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 
 ##--- construct a tni object
 rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
