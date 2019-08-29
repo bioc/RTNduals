@@ -247,9 +247,8 @@ is.singleNumber <- function(para){
   (is.integer(para) || is.numeric(para)) && length(para)==1L && !is.na(para)
 }
 is.singleInteger <- function(para){
-  lg <- (is.integer(para) || is.numeric(para)) && length(para)==1L && 
-    !is.na(para)
-  if(lg) lg <- (para / ceiling(para)) == 1
+  lg <- (is.integer(para) || is.numeric(para)) && length(para) == 1L && !is.na(para)
+  if(lg) lg <- ( (para+1) / (ceiling(para)+1) ) == 1
   return(lg)
 }
 is.singleString <- function(para){
@@ -264,7 +263,7 @@ all.binaryValues <- function(para){
 all.integerValues <- function(para){
   lg <- ( all(is.integer(para)) || all(is.numeric(para)) ) && 
     !any(is.na(para))
-  if(lg) lg <- all ( (para / ceiling(para)) == 1 )
+  if(lg) lg <- all(( (para+1) / (ceiling(para)+1) ) == 1)
   return(lg)
 }
 all.characterValues <- function(para){

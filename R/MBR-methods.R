@@ -47,10 +47,10 @@
 #' @return An \linkS4class{MBR} object.
 #' @examples
 #' ##--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
+#' data("tniData", package = "RTN")
+#' gexp <- tniData$expData
+#' annot <- tniData$rowAnnotation
+#' tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 #' 
 #' ##--- construct a tni object
 #' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
@@ -163,10 +163,10 @@ setMethod("tni2mbrPreprocess",
 #' 'results' listing the inferred 'dual regulons' and correspoding statistics.
 #' @examples
 #' ##--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
+#' data("tniData", package = "RTN")
+#' gexp <- tniData$expData
+#' annot <- tniData$rowAnnotation
+#' tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 #' 
 #' ##--- construct a tni object
 #' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
@@ -452,10 +452,10 @@ setMethod("mbrAssociation",
 #' 'results' listing the input additional evidences.
 #' @examples
 #' ##--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
+#' data("tniData", package = "RTN")
+#' gexp <- tniData$expData
+#' annot <- tniData$rowAnnotation
+#' tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 #' 
 #' ##--- construct a tni object
 #' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
@@ -559,10 +559,10 @@ setMethod( "show",
 #' @return Content from slots in the \linkS4class{MBR} object
 #' @examples
 #' ##--- load a dataset for demonstration
-#' data("dt4rtn", package = "RTN")
-#' gexp <- dt4rtn$gexp
-#' annot <- dt4rtn$gexpIDs
-#' tfs <- dt4rtn$tfs[c("IRF8","IRF1","PRDM1","AFF3","E2F3")]
+#' data("tniData", package = "RTN")
+#' gexp <- tniData$expData
+#' annot <- tniData$rowAnnotation
+#' tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 #' 
 #' ##--- construct a tni object
 #' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)

@@ -1,9 +1,9 @@
 # Unit tests for MBR-class methods
 test_mbr <- function(){
-  data("dt4rtn", package = "RTN")
-  tfs <- dt4rtn$tfs[c("FOXM1", "E2F2")]
-  rtni <- tni.constructor(dt4rtn$gexp, regulatoryElements = tfs, 
-                          rowAnnotation=dt4rtn$gexpIDs)
+  data("tniData", package = "RTN")
+  tfs <- c("FOXM1", "E2F2")
+  rtni <- tni.constructor(tniData$expData, regulatoryElements = tfs, 
+                          rowAnnotation=tniData$rowAnnotation)
   rtni <- tni.permutation(rtni, nPermutations=10)
   rtni <- tni.bootstrap(rtni, nBootstrap=10)
   rtni <- tni.dpi.filter(rtni, eps=NA)
