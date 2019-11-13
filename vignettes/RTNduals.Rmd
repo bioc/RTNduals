@@ -4,7 +4,7 @@ author: "Vinicius S. Chagas, Clarice S. Groeneveld, Kerstin B. Meyer, A. Gordon 
 date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('RTNduals')`"
 bibliography: bibliography.bib
-abstract: <p>RTNduals is a tool derived from the [RTN](http://bioconductor.org/packages/RTN/) (Reconstruction of Transcriptional Networks) package and searches for possible co-regulatory relationships between pairs of regulators. The tool infers dual regulons, a concept that tests whether pairs of regulators have similar effects on shared target genes. Regulons can be of different types (e.g. transcription factor (TF)-TF, miRNA-miRNA, TF-miRNA, TF-mRNA).</p>
+abstract: "<p>RTNduals is a tool derived from the [RTN](http://bioconductor.org/packages/RTN/) (Reconstruction of Transcriptional Networks) package and searches for possible co-regulatory relationships between pairs of regulators. The tool infers dual regulons, a concept that tests whether pairs of regulators have similar effects on shared target genes. Regulons can be of different types (e.g. transcription factor (TF)-TF, miRNA-miRNA, TF-miRNA, TF-mRNA).</p>"
 output: 
   BiocStyle::html_document:
     css: custom.css
