@@ -6,8 +6,12 @@
 \alias{mbrPriorEvidenceTable}
 \title{Entry point for external evidences.}
 \usage{
-\S4method{mbrPriorEvidenceTable}{MBR}(object, priorEvidenceTable,
-  evidenceColname, verbose = TRUE)
+\S4method{mbrPriorEvidenceTable}{MBR}(
+  object,
+  priorEvidenceTable,
+  evidenceColname,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by the 

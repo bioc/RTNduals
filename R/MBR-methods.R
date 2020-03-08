@@ -48,18 +48,19 @@
 #' @examples
 #' ##--- load a dataset for demonstration
 #' data("tniData", package = "RTN")
-#' gexp <- tniData$expData
-#' annot <- tniData$rowAnnotation
 #' tfs <- c("IRF8","IRF1","PRDM1","E2F3","STAT4","LMO4","ZNF552")
 #' 
 #' ##--- construct a tni object
-#' rtni <- tni.constructor(gexp, regulatoryElements = tfs, rowAnnotation=annot)
+#' rtni <- tni.constructor(tniData$expData, regulatoryElements = tfs, 
+#' rowAnnotation=tniData$rowAnnotation)
 #'
 #' ##--- compute regulons 
 #' ## set nPermutations>=1000
 #' rtni <- tni.permutation(rtni, nPermutations=30)
+#' 
 #' ## set nBootstrap>=100
 #' rtni <- tni.bootstrap(rtni, nBootstrap=30)
+#' 
 #' ## 'eps=NA' estimates threshold from empirical null
 #' rtni <- tni.dpi.filter(rtni, eps=NA)
 #' 
@@ -91,7 +92,7 @@ setMethod("tni2mbrPreprocess",
               stop("NOTE: TNI object is not compleate: requires DPI filter!")
             
             #--- creates an MBR object
-            object <- .mbr.constructor(tni) 
+            object <- .mbr.constructor(tni)
             
             #--- match regulatoryElements
             if(is.null(regulatoryElements)) {

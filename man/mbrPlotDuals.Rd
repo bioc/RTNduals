@@ -4,8 +4,12 @@
 \alias{mbrPlotDuals}
 \title{Plot shared targets between regulons.}
 \usage{
-mbrPlotDuals(object, dualreg, filepath = NULL, cols = c("#006400FF",
-  "#CD6600FF"))
+mbrPlotDuals(
+  object,
+  dualreg,
+  filepath = NULL,
+  cols = c("#006400FF", "#CD6600FF")
+)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR} evaluated by 

@@ -6,10 +6,18 @@
 \alias{mbrAssociation}
 \title{Motifs analysis and inference of 'dual regulons'.}
 \usage{
-\S4method{mbrAssociation}{MBR}(object, regulatoryElements = NULL,
-  minRegulonSize = 15, doSizeFilter = FALSE, pValueCutoff = 0.001,
-  pAdjustMethod = "bonferroni", estimator = "spearman",
-  nPermutations = 1000, miFilter = TRUE, verbose = TRUE)
+\S4method{mbrAssociation}{MBR}(
+  object,
+  regulatoryElements = NULL,
+  minRegulonSize = 15,
+  doSizeFilter = FALSE,
+  pValueCutoff = 0.001,
+  pAdjustMethod = "bonferroni",
+  estimator = "spearman",
+  nPermutations = 1000,
+  miFilter = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{object}{A processed object of class \linkS4class{MBR}}

@@ -6,17 +6,16 @@
 ##check annotation of the input regulatory elements in the 'TNI'
 .checkRegel <- function(tni, regel){
   #---check regel
-  tp <- sapply(colnames(tni@rowAnnotation), function(i) {
+  colid <- sapply(colnames(tni@rowAnnotation), function(i) {
     sum(regel%in%tni@rowAnnotation[, i])
   })
-  colid <- names(tp[which.max(tp)])
-  idx <- which(tni@rowAnnotation[, colid]%in%regel)
+  colid <- names(colid[which.max(colid)])
+  idx <- which(tni@rowAnnotation[[colid]]%in%regel)
   if(length(idx) < length(regel)) {
     warning("Not all names in 'regulatoryElements' are available in the 'TNI' rowAnnotation!",
             call.=FALSE)
   }
-  tp <- tni@rowAnnotation[idx,]
-  idx <- tni@regulatoryElements %in% rownames(tp)
+  idx <- tni@regulatoryElements %in% rownames(tni@rowAnnotation)[idx]
   if(sum(idx)==0){
     tp <- paste("NOTE: no names in 'regulatoryElements' has been used to call ",
                 "regulons in the provided 'TNI'!", sep="")
@@ -270,22 +269,4 @@
   return(object)
 }
 
-
-# .merge.tnis <- function (TNI1, TNI2){
-#   elreg1 <- tni.get(TNI1, "regulatoryElements")
-#   elreg2 <- tni.get(TNI2, "regulatoryElements")
-#   elregs <- c(elreg1, elreg2)
-#   elregs <- elregs[!duplicated(elregs)]
-#   rtni_merge <- new("TNI",gexp = tni.get(TNI1, "gexp"), regulatoryElements = elregs)
-#   rtni_merge@rowAnnotation <- object@TNI1@rowAnnotation
-#   rtni_merge@para <- tni.get(TNI1, "para")
-#   tnet1 <- tni.get(TNI1, "refnet")[, elreg1]
-#   tnet2 <- tni.get(TNI2, "refnet")[, setdiff(elreg2,elreg1)]
-#   rtni_merge@results$tn.ref <- cbind(tnet1, tnet2)
-#   tnet1 <- tni.get(TNI1, "tnet")[, elreg1]
-#   tnet2 <- tni.get(TNI2, "tnet")[, setdiff(elreg2,elreg1)]
-#   rtni_merge@results$tn.dpi <- cbind(tnet1, tnet2)
-#   rtni_merge@status [1:4] <- "[x]"
-#   return (rtni_merge)
-# }
 
