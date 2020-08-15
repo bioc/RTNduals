@@ -1,7 +1,7 @@
 Package: RTNduals
 Type: Package
 Title: Analysis of co-regulation and inference of 'dual regulons'
-Version: 1.12.0
+Version: 1.12.1
 Author: Vinicius S. Chagas, Clarice S. Groeneveld, Gordon Robertson, Kerstin B. Meyer, Mauro A. A. Castro
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>, Clarice Groeneveld <clari.groeneveld@gmail.com>
 Depends: R(>= 3.5), RTN(>= 2.6.3), methods
@@ -12,6 +12,6 @@ License: Artistic-2.0
 biocViews: GeneRegulation, GeneExpression, NetworkEnrichment, NetworkInference, GraphAndNetwork
 LazyData: TRUE
 VignetteBuilder: knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Encoding: UTF-8
 NeedsCompilation: no
