@@ -117,16 +117,17 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   #-- get observed data and set xylim
   obdata <- stats::model.frame(model, drop.unused.levels=TRUE)
   obdata <- obdata[,vars]
-  if(showdata){
-    if(is.null(xlim)) 
-      xlim <- range(obdata[,labs[1]])*1.04
-    if(is.null(ylim))
-      ylim <- range(obdata[,labs[2]])*1.04
-  } else {
-    if(is.null(xlim)) 
-      xlim <- range(obdata)*1.04
-    if(is.null(ylim))
-      ylim <- xlim
+  if(is.null(xlim)){
+    xlim <- range(obdata[,labs[1]])
+    f <- abs(diff(xlim))*0.04
+    xlim[1] <- xlim[1]-f
+    xlim[2] <- xlim[2]+f
+  }
+  if(is.null(ylim)){
+    ylim <- range(obdata[,labs[2]])
+    f <- abs(diff(ylim))*0.04
+    ylim[1] <- ylim[1]-f
+    ylim[2] <- ylim[2]+f
   }
   
   #--- check datacols and obdata
@@ -154,8 +155,7 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   dtvars <- .get.vars(vars,labxlim$lim,labylim$lim)
   
   #-- get predictions
-  tp <- class(model)
-  if("lm"%in%tp || "glm"%in%tp){
+  if("lm"%in%class(model) || "glm"%in%class(model)){
     prmat <- .get.predictions.glm(model,dtvars)
     if(is.null(zlab)) zlab = "Response"
     if(is.null(zlog)) zlog = FALSE
@@ -173,10 +173,11 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
     summ <- coef(summary(model))
     tp1 <- paste(vars,collapse = ":")
     tp2 <- paste(rev(vars),collapse = ":")
+    pcol <- grep("Pr",colnames(summ), ignore.case = TRUE)
     if(tp1%in%rownames(summ)){
-      lab_pvalue <- summ[tp1,4]
+      lab_pvalue <- summ[tp1,pcol]
     } else if(tp2%in%rownames(summ)){
-      lab_pvalue <- summ[tp2,4]
+      lab_pvalue <- summ[tp2,pcol]
     } else {
       lab_pvalue <- NA
     }
@@ -288,10 +289,9 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   if(showdata){
     tp <- obdata
     tp[,1] <- tp[,1] + abs(labxlim$lim[1])
-    tp[,1] <- tp[,1]/(labxlim$lim[2]*2)
+    tp[,1] <- tp[,1]/(sum(abs(labxlim$lim)))
     tp[,2] <- tp[,2] + abs(labylim$lim[1])
-    tp[,2] <- tp[,2]/(labylim$lim[2]*2)
-    idx <- rowSums(tp>1 | tp<0)>0
+    tp[,2] <- tp[,2]/(sum(abs(labylim$lim)))
     lncols <- lighter(datacols, factor = -0.4)
     lncols <- adjustcolor(lncols, alpha.f = 0.6)
     bgcols <- lighter(datacols, factor = 1)
@@ -378,19 +378,10 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   if(length(lim)==1)
     lim <- c(-lim,lim)
   labs <- pretty(lim)
+  if(length(labs)>5)labs <- pretty(lim, 4)
   lim <- range(labs)
   at <- labs+abs(lim[1])
   at <- at/max(at)
-  if(length(labs)>5 & max(labs)>1){
-    idx <- labs == round(labs)
-    if(sum(idx)>sum(!idx)){
-      labs <- labs[idx]
-      at <- at[idx]
-    } else {
-      labs <- labs[!idx]
-      at <- at[!idx]
-    }
-  }
   nch <- max(nchar(labs))
   return(list(labs=labs, at=at, lim=lim, nchar=nch))
 }
