@@ -1,7 +1,7 @@
 Package: RTNduals
 Type: Package
 Title: Analysis of co-regulation and inference of 'dual regulons'
-Version: 1.24.0
+Version: 1.25.0
 Author: Vinicius S. Chagas, Clarice S. Groeneveld, Gordon Robertson, Kerstin B. Meyer, Mauro A. A. Castro
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>, Clarice Groeneveld <clari.groeneveld@gmail.com>
 Depends: R(>= 3.6.3), RTN(>= 2.14.1), methods
