@@ -17,31 +17,30 @@ mbrPlotInteraction(
   zlog = NULL,
   zcols = c("#008080ff", "#d45500ff"),
   ycols = c("#4A97C9", "#D92522"),
-  showdata = FALSE,
   datacols = "grey50",
   fname = "interplot",
   fpath = ".",
   width = 4.5,
   height = 4,
-  plotype = c("3D", "2D"),
+  plotype = c("p1", "p2", "p3", "p4"),
   plotpdf = FALSE
 )
 }
 \arguments{
 \item{model}{An object of class 'lm', 'glm', or 'coxph'.}
 
-\item{vars}{A character vector of length 2 with the names of two varibles in the 'model'.}
+\item{vars}{A character vector of length 2 with the names of two variables in the 'model'.}
 
 \item{xlim}{A numeric vector of length 2, i.e. xlim = c(x1, x2), 
-indicating the x limits of the plot. If xlim = NULL, it will be derevided  
+indicating the x limits of the plot. If xlim = NULL, it will be derived  
 from the observed data ranges.}
 
 \item{ylim}{A numeric vector of length 2, i.e. ylim = c(y1, y2), 
-indicating the y limits of the plot. If ylim = NULL, it will be derevided 
+indicating the y limits of the plot. If ylim = NULL, it will be derived 
 from the observed data ranges.}
 
 \item{zlim}{A numeric vector of length 2, i.e. zlim = c(z1, z2), 
-indicating the z limits of the plot. If zlim = NULL, it will be derevided 
+indicating the z limits of the plot. If zlim = NULL, it will be derived 
 from the observed data ranges.}
 
 \item{xlab}{A string with the label for the x-axis.}
@@ -55,16 +54,13 @@ from the observed data ranges.}
 \item{zlog}{A logical value indicating whether the z axis is to be logarithmic.}
 
 \item{zcols}{A vector of length 2 indicating a diverging color scheme 
-for the z-axis varible.}
+for the z-axis variable.}
 
 \item{ycols}{A vector of length 2 indicating a diverging color scheme 
 for the y-axis varible (only used when type='2D').}
 
-\item{showdata}{A logical value indicating whether to show the original data 
-used to fit linear model.}
-
 \item{datacols}{When 'showdata = TRUE', this can be a named vector of colors for 
-data points (names should match samples in the 'model' object). Alternativelly, 
+data points (names should match samples in the 'model' object). Alternatively, 
 it can be a single color value.}
 
 \item{fname}{A string. The name of the PDF file which will contain the plot.}
@@ -75,8 +71,10 @@ it can be a single color value.}
 
 \item{height}{A numeric value. The height of the plot.}
 
-\item{plotype}{A string indicating '2D' of '3D' plot type. If plotype = '2D', 
-the z-axis (and all related parameters) is transposed to the y-axis.}
+\item{plotype}{A string indicating a plot type 
+(either 'p1', 'p2', 'p3', or 'p4'). Plot types 'p1' and 'p2' will represent 
+the response variable on the y-axis, while plot types 'p2' and 'p3' will 
+represent the response variable on the z-axis.}
 
 \item{plotpdf}{A logical value.}
 }
@@ -88,7 +86,7 @@ This function plots the interaction effects between two continuous variables
 for linear, logistic, or Cox models.
 }
 \examples{
-#-- Example of simulated data, with response variable modelled by:
+#-- Example of simulated data, with response variable modeled by:
 #-- (1) Main effects of 'reg1' and 'reg2'
 #-- (2) Interaction effects between 'reg1' and 'reg2' 
 #-- (3) Additional random uniform noise
@@ -97,6 +95,6 @@ reg2 <- rnorm(1000,0,2)
 response <- 3*reg1 + 2*reg1*reg2 + runif(1000,0,2)
 dataset <- data.frame(reg1, reg2, response)
 model <- lm(response ~ reg1*reg2, data=dataset)
-mbrPlotInteraction(model, vars=c("reg1","reg2"))
+mbrPlotInteraction(model, vars = c("reg1","reg2"))
 
 }

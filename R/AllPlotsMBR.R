@@ -9,15 +9,15 @@
 #' for linear, logistic, or Cox models.
 #'
 #' @param model An object of class 'lm', 'glm', or 'coxph'.
-#' @param vars A character vector of length 2 with the names of two varibles in the 'model'.
+#' @param vars A character vector of length 2 with the names of two variables in the 'model'.
 #' @param xlim A numeric vector of length 2, i.e. xlim = c(x1, x2), 
-#' indicating the x limits of the plot. If xlim = NULL, it will be derevided  
+#' indicating the x limits of the plot. If xlim = NULL, it will be derived  
 #' from the observed data ranges.
 #' @param ylim A numeric vector of length 2, i.e. ylim = c(y1, y2), 
-#' indicating the y limits of the plot. If ylim = NULL, it will be derevided 
+#' indicating the y limits of the plot. If ylim = NULL, it will be derived 
 #' from the observed data ranges.
 #' @param zlim A numeric vector of length 2, i.e. zlim = c(z1, z2), 
-#' indicating the z limits of the plot. If zlim = NULL, it will be derevided 
+#' indicating the z limits of the plot. If zlim = NULL, it will be derived 
 #' from the observed data ranges.
 #' @param xlab A string with the label for the x-axis.
 #' @param ylab A string with the label for the y-axis.
@@ -25,24 +25,24 @@
 #' @param zcenter A numeric value indicating a z value to center the color scale.
 #' @param zlog A logical value indicating whether the z axis is to be logarithmic.
 #' @param zcols A vector of length 2 indicating a diverging color scheme 
-#' for the z-axis varible.
+#' for the z-axis variable.
 #' @param ycols A vector of length 2 indicating a diverging color scheme 
 #' for the y-axis varible (only used when type='2D').
-#' @param showdata A logical value indicating whether to show the original data 
-#' used to fit linear model.
 #' @param datacols  When 'showdata = TRUE', this can be a named vector of colors for 
-#' data points (names should match samples in the 'model' object). Alternativelly, 
+#' data points (names should match samples in the 'model' object). Alternatively, 
 #' it can be a single color value.
 #' @param fname A string. The name of the PDF file which will contain the plot.
 #' @param fpath A string. The directory where the file will be saved.
 #' @param width A numeric value. The width of the plot.
 #' @param height A numeric value. The height of the plot.
-#' @param plotype A string indicating '2D' of '3D' plot type. If plotype = '2D', 
-#' the z-axis (and all related parameters) is transposed to the y-axis.
+#' @param plotype A string indicating a plot type 
+#' (either 'p1', 'p2', 'p3', or 'p4'). Plot types 'p1' and 'p2' will represent 
+#' the response variable on the y-axis, while plot types 'p2' and 'p3' will 
+#' represent the response variable on the z-axis.
 #' @param plotpdf A logical value.
 #' @return A interaction plot.
 #' @examples
-#' #-- Example of simulated data, with response variable modelled by:
+#' #-- Example of simulated data, with response variable modeled by:
 #' #-- (1) Main effects of 'reg1' and 'reg2'
 #' #-- (2) Interaction effects between 'reg1' and 'reg2' 
 #' #-- (3) Additional random uniform noise
@@ -51,22 +51,20 @@
 #' response <- 3*reg1 + 2*reg1*reg2 + runif(1000,0,2)
 #' dataset <- data.frame(reg1, reg2, response)
 #' model <- lm(response ~ reg1*reg2, data=dataset)
-#' mbrPlotInteraction(model, vars=c("reg1","reg2"))
+#' mbrPlotInteraction(model, vars = c("reg1","reg2"))
 #'
-#' @importFrom stats model.frame predict coef terms
+#' @importFrom stats model.frame predict coef terms lm
 #' @importFrom graphics image layout mtext plot
 #' @importFrom grDevices adjustcolor rgb2hsv hsv
 #' @export
 
 ##------------------------------------------------------------------------------
 mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NULL, 
-                               xlab = NULL, ylab = NULL, zlab = NULL, zcenter = NULL, 
-                               zlog = NULL, zcols = c("#008080ff","#d45500ff"), 
-                               ycols = c("#4A97C9","#D92522"),
-                               showdata = FALSE, datacols = "grey50", 
-                               fname = "interplot", fpath = ".", 
-                               width = 4.5, height = 4, plotype = c("3D","2D"),
-                               plotpdf = FALSE){
+  xlab = NULL, ylab = NULL, zlab = NULL, zcenter = NULL, 
+  zlog = NULL, zcols = c("#008080ff","#d45500ff"), 
+  ycols = c("#4A97C9","#D92522"), datacols = "grey50", 
+  fname = "interplot", fpath = ".", width = 4.5, height = 4, 
+  plotype = c("p1", "p2", "p3", "p4"), plotpdf = FALSE){
   #--- checks
   mbr.checks(name="model", para=model)
   mbr.checks(name="vars", para=vars)
@@ -80,7 +78,6 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   if(!is.null(zcenter)) mbr.checks(name="zcenter", para=zcenter)
   mbr.checks(name="zcols", para=zcols)
   mbr.checks(name="ycols", para=ycols)
-  mbr.checks(name="showdata", para=showdata)
   mbr.checks(name="datacols", para=datacols)
   mbr.checks(name="fname", para=fname)
   mbr.checks(name="fpath", para=fpath)
@@ -89,16 +86,15 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   mbr.checks(name="plotpdf", para=plotpdf)
   plotype <- match.arg(plotype)
   .mbrPlotInteraction(model, vars, xlim, ylim, zlim, xlab, ylab, zlab, 
-                      zcenter, zlog, zcols, ycols, showdata, datacols, 
-                      fname, fpath, width, height, plotype, plotpdf)
+    zcenter, zlog, zcols, ycols, datacols, fname, fpath, width, height, 
+    plotype, plotpdf)
   
 }
 
 ##------------------------------------------------------------------------------
 .mbrPlotInteraction <- function(model, vars, xlim, ylim, zlim, xlab, ylab, 
-                                zlab, zcenter, zlog, zcols, ycols, showdata, 
-                                datacols, fname, fpath, width, height, 
-                                plotype, plotpdf){
+  zlab, zcenter, zlog, zcols, ycols, datacols, fname, fpath, width, height, 
+  plotype, plotpdf){
   vartypes <- attr(terms(model),"dataClasses")
   if(!all(vars%in%names(vartypes)))
     stop("All 'vars' should be listed in the 'model'!", call. = FALSE) 
@@ -107,24 +103,31 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   
   #--- set xy labels
   labs <- names(vars)
-  if(is.null(labs) || !all.characterValues(labs))
+  if(is.null(labs) || !.all_characterValues(labs))
     labs <- vars
-  if(is.null(xlab))
-    xlab = labs[1]
-  if(is.null(ylab))
-    ylab = labs[2]
+  if(is.null(xlab)) xlab = labs[1]
+  if(is.null(ylab)) ylab = labs[2]
   
   #-- get observed data and set xylim
   obdata <- stats::model.frame(model, drop.unused.levels=TRUE)
   obdata <- obdata[,vars]
+  colnames(obdata) <- c("x","y")
+  
+  #-- set y status
+  if(any(obdata[, "y"] < 0, na.rm=T)){
+    obdata$idx <- obdata[, "y"] < 0
+  } else {
+    obdata$idx <- obdata[, "y"] < median(obdata[,"y"], na.rm=)
+  }
+  
   if(is.null(xlim)){
-    xlim <- range(obdata[,labs[1]])
+    xlim <- range(obdata[, "x"])
     f <- abs(diff(xlim))*0.04
     xlim[1] <- xlim[1]-f
     xlim[2] <- xlim[2]+f
   }
   if(is.null(ylim)){
-    ylim <- range(obdata[,labs[2]])
+    ylim <- range(obdata[, "y"])
     f <- abs(diff(ylim))*0.04
     ylim[1] <- ylim[1]-f
     ylim[2] <- ylim[2]+f
@@ -152,15 +155,17 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   labylim <- .prettylabs(ylim)
   
   #--- get vars
-  dtvars <- .get.vars(vars,labxlim$lim,labylim$lim)
+  dtvars <- .get.vars(vars, labxlim$lim, labylim$lim)
   
   #-- get predictions
-  if("lm"%in%class(model) || "glm"%in%class(model)){
-    prmat <- .get.predictions.glm(model,dtvars)
+  if(is(model,"lm") || is(model,"glm")){
+    prmat <- .get.predictions.glm(model, dtvars)
+    obdata$response <- predict(model)
     if(is.null(zlab)) zlab = "Response"
     if(is.null(zlog)) zlog = FALSE
-  } else if("coxph"%in%class(model)){
-    prmat <- .get.predictions.coxph(model,dtvars)
+  } else if(is(model,"coxph")){
+    prmat <- .get.predictions.coxph(model, dtvars)
+    obdata$response <- predict(model, type="risk")
     if(is.null(zlab)) zlab = "HR"
     if(is.null(zlog)) zlog = TRUE
   } else {
@@ -173,7 +178,7 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
     summ <- coef(summary(model))
     tp1 <- paste(vars,collapse = ":")
     tp2 <- paste(rev(vars),collapse = ":")
-    pcol <- grep("Pr",colnames(summ), ignore.case = TRUE)
+    pcol <- grep("Pr", colnames(summ), ignore.case = TRUE)
     if(tp1%in%rownames(summ)){
       lab_pvalue <- summ[tp1,pcol]
     } else if(tp2%in%rownames(summ)){
@@ -184,15 +189,20 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   }
   
   #-- set zlim
-  if(is.null(zlim))
-    zlim <- range(prmat)
-  if(plotype=="3D"){
+  if(plotype=="p4"){
     nn <- 100
+    if(is.null(zlim)) zlim <- range(prmat)
   } else {
-    nn <- 10
+    nn <- ifelse(plotype %in% c("p1","p2"), 10, 100)
+    if(is.null(zlim)){
+      zlim <- range(obdata$response)
+    } else {
+      obdata$response[obdata$response<zlim[1]] <- zlim[1]
+      obdata$response[obdata$response>zlim[2]] <- zlim[2]
+    }
   }
   if(zlog){
-    if(is.null(zcenter))zcenter <- 1
+    if(is.null(zcenter)) zcenter <- 1
     labzlim <- .prettycenter(zlim, n=nn, center=zcenter)
   } else {
     if(is.null(zcenter)){
@@ -206,17 +216,25 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   if(plotpdf){
     fname <- gsub(".pdf", '',fname, ignore.case = TRUE)
     fname <- paste(fname,".pdf", sep = "")
-    pdf(file = paste(fpath, "/", fname, sep = ""), width = width, height = height)
+    pdf(file = paste(fpath, "/", fname, sep = ""), width = width, 
+        height = height)
   }
-  if(plotype=="3D"){
-    .plot3D(prmat=prmat, obdata=obdata, labxlim=labxlim, labylim=labylim, 
-            labzlim=labzlim, xlab=xlab, ylab=ylab, zlab=zlab, zcols=zcols, 
-            zlog=zlog, showdata=showdata, 
-            datacols=datacols, lab_pvalue=lab_pvalue)
-  } else {
-    .plot2D(prmat=prmat, dtvars=dtvars, labxlim=labxlim, labylim=labylim, 
-            labzlim=labzlim, xlab=xlab, ylab=ylab, zlab=zlab, 
-            zlog=zlog, ycols=ycols)
+  if(plotype=="p1"){
+    .plot2D_1(obdata = obdata, prmat=prmat, dtvars=dtvars, 
+      labxlim=labxlim, labylim=labylim, labzlim=labzlim, xlab=xlab, 
+      ylab=ylab, zlab=zlab, zlog=zlog, ycols=ycols)
+  } else if(plotype=="p2"){
+    .plot2D_2(obdata=obdata, labxlim=labxlim, labylim=labylim, 
+      labzlim=labzlim, xlab=xlab, ylab=ylab, zlab=zlab, 
+      zlog=zlog, ycols=ycols, datacols=datacols)
+  } else if(plotype=="p3"){
+    .plot3D_1(obdata=obdata, labxlim=labxlim, labylim=labylim, 
+      labzlim=labzlim, xlab=xlab, ylab=ylab, zlab=zlab, zcols=zcols, 
+      zlog=zlog, datacols=datacols, lab_pvalue=lab_pvalue)
+  } else if(plotype=="p4"){
+    .plot3D_2(prmat=prmat, obdata=obdata, labxlim=labxlim, labylim=labylim, 
+      labzlim=labzlim, xlab=xlab, ylab=ylab, zlab=zlab, zcols=zcols, 
+      zlog=zlog, datacols=datacols, lab_pvalue=lab_pvalue)
   }
   if(plotpdf){
     dev.off()
@@ -226,13 +244,13 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   }
 }
 
-##------------------------------------------------------------------------------
-.plot2D <- function(prmat, dtvars, labxlim, labylim, labzlim, xlab, 
-                    ylab, zlab, zlog, ycols){
+#-------------------------------------------------------------------------------
+.plot2D_1 <- function(obdata, prmat, dtvars, labxlim, labylim, labzlim, xlab, 
+  ylab, zlab, zlog, ycols){
   
   #-- set prmat and zlim
-  prmat[prmat<labzlim$lim[1]] <- NA
-  prmat[prmat>labzlim$lim[2]] <- NA
+  prmat[prmat < labzlim$lim[1]] <- NA
+  prmat[prmat > labzlim$lim[2]] <- NA
   
   #-- set xy lims (note that z is at y-axis here)
   if(zlog){
@@ -243,8 +261,10 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
     log=""
     zlb <- zat <- labzlim$xlabs
   }
-  ract1 <- cbind(dtvars$var1,prmat[,1])
-  ract2 <- cbind(dtvars$var1,prmat[,ncol(prmat)])
+  y1 <- which.min(abs(dtvars$var2 - median(obdata$y[obdata$idx])))
+  y2 <- which.min(abs(dtvars$var2 - median(obdata$y[!obdata$idx])))
+  ract1 <- cbind(dtvars$var1, prmat[, y1])
+  ract2 <- cbind(dtvars$var1, prmat[, y2])
   #-- plot
   op <- par(no.readonly = TRUE)
   par(mar=c(4,4.3,2.8,4.5), mgp=c(2, 0.4, 0.2), cex=1)
@@ -256,16 +276,98 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   title(xlab = xlab, mgp=c(2.2, 0.4, 0), cex.lab=1.2)
   title(ylab = zlab, mgp=c(3, 0.4, 0), cex.lab=1.2)
   par(xpd=TRUE)
-  ylim <- format(format(labylim$lim), width = nchar(ylab))
-  legend(x = "topright", legend = rev(ylim), col = rev(ycols), bty = "n", pt.cex = 1.2, 
-         cex=0.8, title = ylab, title.adj = 0, pch = 15, inset = c(-0.25,0))
+  legend(x = "topright", legend = c("high","low"), col = rev(ycols), bty = "n", 
+    pt.cex = 1.2, cex=0.8, title = ylab, title.adj = 0, pch = 15, inset = c(-0.1,0))
+  
   par(op)
 }
 
 ##------------------------------------------------------------------------------
-.plot3D <- function(prmat, obdata, labxlim, labylim, labzlim, xlab, 
-                    ylab, zlab, zcols, zlog=TRUE, showdata=FALSE, 
-                    datacols="grey80",lab_pvalue){
+.plot2D_2 <- function(obdata, labxlim, labylim, labzlim, xlab, 
+  ylab, zlab, zlog, ycols, datacols){
+  #-- set xy lims (note that z is at y-axis here)
+  if(zlog){
+    log="y"
+    zlb <- labzlim$labs
+    zat <- labzlim$at
+  } else {
+    log=""
+    zlb <- zat <- labzlim$xlabs
+  }
+  #-- plot
+  op <- par(no.readonly = TRUE)
+  par(mar=c(4,4.3,2.8,4.5), mgp=c(2, 0.4, 0.2), cex=1)
+  plot(NA, ylim=labzlim$lim, xlim=labxlim$lim, axes = F, xlab="", ylab="", log = log)
+  points(x=obdata[obdata$idx, "x"], y=obdata[obdata$idx, "response"], 
+    col=adjustcolor(ycols[1], alpha.f = 0.3))
+  points(x=obdata[!obdata$idx,"x"], y=obdata[!obdata$idx,"response"], 
+    col=adjustcolor(ycols[2], alpha.f = 0.3))
+  axis(1, las=1, tcl=-0.2, lwd=1.8, cex.axis=1.2, labels = labxlim$labs, 
+    at = labxlim$labs)
+  axis(2, las=1, tcl=-0.2, lwd=1.8, cex.axis=1.2, labels = zlb, at = zat)
+  title(xlab = xlab, mgp=c(2.2, 0.4, 0), cex.lab=1.2)
+  title(ylab = zlab, mgp=c(3, 0.4, 0), cex.lab=1.2)
+  par(xpd=TRUE)
+  legend(x = "topright", legend = c("high","low"), col = rev(ycols), bty = "n", pt.cex = 1.2, 
+         cex=0.8, title = ylab, title.adj = 0, pch = 15, inset = c(-0.1,0))
+  par(op)
+}
+
+
+##------------------------------------------------------------------------------
+.plot3D_1 <- function(obdata, labxlim, labylim, labzlim, xlab, 
+  ylab, zlab, zcols, zlog=TRUE, datacols="grey80", lab_pvalue){
+  
+  #-- get labs and color palette
+  bks <- labzlim$at
+  ptlow <- colorRampPalette(c(zcols[1], "white"))(sum(bks <= labzlim$center))
+  pthigh <- colorRampPalette(c("white", zcols[2]))(sum(bks > labzlim$center))[-1]
+  pal <- c(ptlow, pthigh)
+  pcols <- pal[cut(obdata$response, breaks = bks, include.lowest = TRUE)]
+  
+  #-- plot window
+  op <- par(no.readonly=TRUE)
+  layout(matrix(c(1,2), ncol=2), widths = c(4,1))
+  par(mar=c(4,4.3,2.8,0.5), mgp=c(2, 0.4, 0.2), cex=1)
+  plot.new()
+  axis(1,las=1, tcl=-0.2, lwd=1.8, at = labxlim$at, labels = labxlim$labs, cex.axis=1.2)
+  axis(2,las=1, tcl=-0.2, lwd=1.8, at = labylim$at, labels = labylim$labs, cex.axis=1.2)
+  
+  #-- add obdata
+  tp <- obdata
+  tp[,1] <- tp[,1] - labxlim$lim[1]
+  tp[,1] <- tp[,1]/(labxlim$lim[2] - labxlim$lim[1])
+  tp[,2] <- tp[,2] - labylim$lim[1]
+  tp[,2] <- tp[,2]/(labylim$lim[2] - labylim$lim[1])
+  lncols <- lighter(datacols, factor = -0.4)
+  lncols <- adjustcolor(lncols, alpha.f = 0.6)
+  bgcols <- lighter(datacols, factor = 1)
+  bgcols <- adjustcolor(bgcols, alpha.f = 0.9)
+  points(x=tp[,1],y=tp[,2], cex=1, pch=21, col=lncols, bg=pcols, lwd=0.6)
+  
+  #-- add labs
+  title(ylab = ylab, adj = 0.5, cex.lab = 1.2, mgp = c(if(labylim$nchar<=2) 1.8 else 2.5, 0.4, 0))
+  title(xlab = xlab, adj = 0.5, cex.lab = 1.2, mgp = c(1.6, 0.4, 0))
+  
+  #--- add leg
+  par(xpd=TRUE)
+  if(!is.na(lab_pvalue)){
+    lab_pvalue <- paste("Adjusted P-value: ", format(lab_pvalue, digits = 3, scientific = TRUE))
+    legend("topright", cex = 0.8, legend = lab_pvalue, bty = "n", inset = c(0,-0.1))
+  }
+  par(mar=c(11,0,4,3.5), mgp=c(3, 0.4, 0), cex=1)
+  image(matrix(bks, ncol=length(bks)), col = pal, breaks = bks, axes=F)
+  at <- 0:(length(labzlim$at)-1)
+  at <- at/(length(labzlim$at)-1)
+  idx <- !is.na(labzlim$labs)
+  axis(4,labels = labzlim$labs[idx], at = at[idx],lwd=2,las=1, tcl=-0.2, cex.axis = 0.8)
+  mtext(zlab, side = 3, adj = 0, line = 0.3)
+  par(op)
+}
+
+##------------------------------------------------------------------------------
+.plot3D_2 <- function(prmat, obdata, labxlim, labylim, labzlim, xlab, 
+  ylab, zlab, zcols, zlog=TRUE, datacols="grey80", lab_pvalue){
   
   #-- set prmat and zlim
   prmat[prmat<labzlim$lim[1]] <- labzlim$lim[1]
@@ -286,18 +388,16 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   axis(2,las=1, tcl=-0.2, lwd=1.8, at = labylim$at, labels = labylim$labs, cex.axis=1.2)
   
   #-- add obdata
-  if(showdata){
-    tp <- obdata
-    tp[,1] <- tp[,1] + abs(labxlim$lim[1])
-    tp[,1] <- tp[,1]/(sum(abs(labxlim$lim)))
-    tp[,2] <- tp[,2] + abs(labylim$lim[1])
-    tp[,2] <- tp[,2]/(sum(abs(labylim$lim)))
-    lncols <- lighter(datacols, factor = -0.4)
-    lncols <- adjustcolor(lncols, alpha.f = 0.6)
-    bgcols <- lighter(datacols, factor = 1)
-    bgcols <- adjustcolor(bgcols, alpha.f = 0.9)
-    points(x=tp[,1],y=tp[,2], cex=0.7, pch=21, col=lncols, bg=bgcols, lwd=0.6)
-  }
+  tp <- obdata
+  tp[,1] <- tp[,1] - labxlim$lim[1]
+  tp[,1] <- tp[,1]/(labxlim$lim[2] - labxlim$lim[1])
+  tp[,2] <- tp[,2] - labylim$lim[1]
+  tp[,2] <- tp[,2]/(labylim$lim[2] - labylim$lim[1])
+  lncols <- lighter(datacols, factor = -0.4)
+  lncols <- adjustcolor(lncols, alpha.f = 0.6)
+  bgcols <- lighter(datacols, factor = 1)
+  bgcols <- adjustcolor(bgcols, alpha.f = 0.9)
+  points(x=tp[,1],y=tp[,2], cex=0.7, pch=21, col=lncols, bg=bgcols, lwd=0.6)
   
   #-- add labs
   title(ylab = ylab, adj = 0.5, cex.lab = 1.2, mgp = c(if(labylim$nchar<=2) 1.8 else 2.5, 0.4, 0))
@@ -306,7 +406,7 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   #--- add leg
   par(xpd=TRUE)
   if(!is.na(lab_pvalue)){
-    lab_pvalue <- paste("Interaction P: ", format(lab_pvalue, digits = 3, scientific = TRUE))
+    lab_pvalue <- paste("Adjusted P-value: ", format(lab_pvalue, digits = 3, scientific = TRUE))
     legend("topright", cex = 0.8, legend = lab_pvalue, bty = "n", inset = c(0,-0.1))
   }
   par(mar=c(11,0,4,3.5), mgp=c(3, 0.4, 0), cex=1)
@@ -331,22 +431,22 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
     }
   }
   colnames(dt) <- vars
-  return(list(dt=dt,var1=var1, var2=var2, n=n))
+  return(list(dt=dt, var1=var1, var2=var2, n=n))
 }
 
 ##------------------------------------------------------------------------------
 #predictions from lm or glm
-.get.predictions.glm <- function(model,dtvars,n){
+.get.predictions.glm <- function(model, dtvars){
   pm <- predict(model, newdata=data.frame(dtvars$dt), type="response")
-  prmat <- array(pm,dim=c(dtvars$n,dtvars$n))
+  prmat <- array(pm, dim=c(dtvars$n,dtvars$n))
   return(prmat)
 }
 
 ##------------------------------------------------------------------------------
 #predictions from coxph
-.get.predictions.coxph<-function(model,dtvars){
-  pm <- predict(model, newdata=data.frame(dtvars$dt), type="risk")
-  prmat <- array(pm,dim=c(dtvars$n,dtvars$n))
+.get.predictions.coxph<-function(model, dtvars){
+  pm <- predict(model, newdata = data.frame(dtvars$dt), type="risk")
+  prmat <- array(pm, dim = c(dtvars$n,dtvars$n))
   return(prmat)
 }
 
@@ -378,9 +478,10 @@ mbrPlotInteraction <- function(model, vars, xlim = NULL, ylim = NULL, zlim = NUL
   if(length(lim)==1)
     lim <- c(-lim,lim)
   labs <- pretty(lim)
-  if(length(labs)>5)labs <- pretty(lim, 4)
+  if(length(labs)>5) labs <- pretty(lim, 4)
   lim <- range(labs)
-  at <- labs+abs(lim[1])
+  at <- labs + abs(lim[1])
+  at <- at-min(at)
   at <- at/max(at)
   nch <- max(nchar(labs))
   return(list(labs=labs, at=at, lim=lim, nchar=nch))
@@ -548,7 +649,7 @@ mbrPlotDuals <- function(object, dualreg, filepath=NULL,
       r_adjpval <- paste("= ",format(r_adjpval,digits=2, scientific = T),sep="")
     }
     tp <- paste("= ",format(r_val,digits=3,nsmall=3),sep="")
-    leg1 <- c("Regulons' association",paste("R ", tp, sep=""),
+    leg1 <- c("Regulatory association",paste("R ", tp, sep=""),
               paste("Adj. Pvalue ", r_adjpval, sep=""))
   } else {
     leg1 <- NULL
@@ -592,7 +693,7 @@ mbrPlotDuals <- function(object, dualreg, filepath=NULL,
     #agree
     tpp<-xy[rowSums(sign(xy))!=0, ]
     points(tpp,col="grey",pch=21,cex=cexleg1,bg="grey", lwd=0.70)
-    legend("topright", c(leg1), bty="n", cex = cexleg2, text.font = c(2,1,1,1))
+    legend("topright", c(leg1), bty="n", cex = cexleg2, text.font = c(2,1,1))
   } else {
     ##---positive Dual
     #co-activation
@@ -604,7 +705,7 @@ mbrPlotDuals <- function(object, dualreg, filepath=NULL,
     #compete
     tpp<-xy[abs(rowSums(sign(xy)))!=2, ]
     points(tpp,col="grey",pch=21,cex=cexleg1,bg="grey", lwd=0.70)
-    legend("bottomright", c(leg1), bty="n", cex = cexleg2, text.font = c(2,1,1,1))
+    legend("bottomright", c(leg1), bty="n", cex = cexleg2, text.font = c(2,1,1))
   }
   ##--- 
   if(!is.null(filename)){
