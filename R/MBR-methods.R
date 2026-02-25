@@ -278,7 +278,7 @@ setMethod("mbrAssociation",
             
             ##--- get mi from refnet
             if(verbose) {
-                cat("-Extrating inferred regulatory associations...\n")
+                cat("-Extracting inferred regulatory associations...\n")
             }
             mitnet <- abs(tni.get(tni, what="refnet"))
             mitnet <- mitnet[targets,regulatoryElements, drop=FALSE]
